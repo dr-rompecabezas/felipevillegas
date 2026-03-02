@@ -6,23 +6,55 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('wagtailcore', '0096_referenceindex_referenceindex_source_object_and_more'),
+        ("wagtailcore", "0096_referenceindex_referenceindex_source_object_and_more"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='HomePage',
+            name="HomePage",
             fields=[
-                ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.page')),
-                ('body', wagtail.fields.StreamField([('hero', 3), ('about', 5), ('featured_work', 7), ('skills', 9), ('contact_cta', 10)], blank=True, block_lookup={0: ('wagtail.blocks.CharBlock', (), {}), 1: ('wagtail.blocks.TextBlock', (), {}), 2: ('wagtail.blocks.StructBlock', [[('text', 0), ('url', 0)]], {}), 3: ('wagtail.blocks.StructBlock', [[('heading', 0), ('subtitle', 1), ('cta_primary', 2), ('cta_secondary', 2)]], {}), 4: ('wagtail.blocks.RichTextBlock', (), {}), 5: ('wagtail.blocks.StructBlock', [[('content', 4)]], {}), 6: ('wagtail.blocks.CharBlock', (), {'default': 'Selected Work'}), 7: ('wagtail.blocks.StructBlock', [[('heading', 6)]], {}), 8: ('wagtail.blocks.ListBlock', (0,), {}), 9: ('wagtail.blocks.StructBlock', [[('heading', 0), ('skills', 8)]], {}), 10: ('wagtail.blocks.StructBlock', [[('heading', 0), ('message', 1)]], {})})),
+                (
+                    "page_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="wagtailcore.page",
+                    ),
+                ),
+                (
+                    "body",
+                    wagtail.fields.StreamField(
+                        [("hero", 3), ("about", 5), ("featured_work", 7), ("skills", 9), ("contact_cta", 10)],
+                        blank=True,
+                        block_lookup={
+                            0: ("wagtail.blocks.CharBlock", (), {}),
+                            1: ("wagtail.blocks.TextBlock", (), {}),
+                            2: ("wagtail.blocks.StructBlock", [[("text", 0), ("url", 0)]], {}),
+                            3: (
+                                "wagtail.blocks.StructBlock",
+                                [[("heading", 0), ("subtitle", 1), ("cta_primary", 2), ("cta_secondary", 2)]],
+                                {},
+                            ),
+                            4: ("wagtail.blocks.RichTextBlock", (), {}),
+                            5: ("wagtail.blocks.StructBlock", [[("content", 4)]], {}),
+                            6: ("wagtail.blocks.CharBlock", (), {"default": "Selected Work"}),
+                            7: ("wagtail.blocks.StructBlock", [[("heading", 6)]], {}),
+                            8: ("wagtail.blocks.ListBlock", (0,), {}),
+                            9: ("wagtail.blocks.StructBlock", [[("heading", 0), ("skills", 8)]], {}),
+                            10: ("wagtail.blocks.StructBlock", [[("heading", 0), ("message", 1)]], {}),
+                        },
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
-            bases=('wagtailcore.page',),
+            bases=("wagtailcore.page",),
         ),
     ]

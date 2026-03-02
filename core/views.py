@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.http import FileResponse,HttpRequest, JsonResponse
+from django.http import FileResponse, HttpRequest, JsonResponse
 from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_GET
 

@@ -1,13 +1,21 @@
-from .base import *  # noqa: F401, F403
 import dj_database_url
 from decouple import config
+
+from .base import *  # noqa: F401, F403
 
 DEBUG = False
 
 DATABASES = {"default": dj_database_url.config(env="DATABASE_URL", conn_max_age=600)}
 
 # S3 media storage
-DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY")
 AWS_STORAGE_BUCKET_NAME = config("AWS_STORAGE_BUCKET_NAME")
@@ -18,7 +26,6 @@ AWS_DEFAULT_ACL = None
 MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/"
 
 # WhiteNoise for static files
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Security headers
 SECURE_SSL_REDIRECT = True
