@@ -94,6 +94,7 @@ CSRF_COOKIE_SECURE = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
 # ── Logging ──────────────────────────────────────────────────────────
+_LOG_LEVEL = os.environ.get("DJANGO_LOG_LEVEL", "INFO").upper()
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -112,12 +113,12 @@ LOGGING = {
     },
     "root": {
         "handlers": ["console"],
-        "level": os.environ.get("DJANGO_LOG_LEVEL", "INFO"),
+        "level": _LOG_LEVEL,
     },
     "loggers": {
         "django": {
             "handlers": ["console"],
-            "level": os.environ.get("DJANGO_LOG_LEVEL", "INFO"),
+            "level": _LOG_LEVEL,
             "propagate": False,
         },
         "wagtail": {
