@@ -11,9 +11,9 @@ dependencies = [
     "gunicorn>=25.1.0",
     "psycopg[binary]>=3.3.3",
     "python-decouple>=3.8",
-    "stripe>=14.4.0",
     "wagtail>=7.3",
     "whitenoise[brotli]>=6.12.0",
+    "sentry-sdk[django]>=2.0",
 ]
 
 [tool.uv]
