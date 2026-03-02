@@ -2,7 +2,7 @@
   "$schema": "https://railway.com/railway.schema.json",
   "build": {
     "builder": "RAILPACK",
-    "buildCommand": "npm install && npm run build:css && DJANGO_SETTINGS_MODULE=config.settings.production python3 manage.py collectstatic --noinput && DJANGO_SETTINGS_MODULE=config.settings.production python3 manage.py shell -c \"from django.contrib.staticfiles.storage import staticfiles_storage; staticfiles_storage.url('css/tailwind.css')\""
+    "buildCommand": "npm install && npm run build:css && DJANGO_SETTINGS_MODULE=config.settings.production python3 manage.py collectstatic --noinput && python3 -c \"import json; print(json.load(open(\\\"staticfiles/staticfiles.json\\\"))[\\\"paths\\\"][\\\"css/tailwind.css\\\"])\""
   },
   "deploy": {
     "runtime": "V2",
