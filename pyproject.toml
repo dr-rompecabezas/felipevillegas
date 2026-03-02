@@ -42,4 +42,4 @@ ignore = [
 ]
 
 [tool.ruff.lint.isort]
-known-first-party = ["home", "work", "photography", "contact", "config"]
+known-first-party = ["config", "contact", "core", "home", "photography", "users", "work"]
