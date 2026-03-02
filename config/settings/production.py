@@ -39,7 +39,7 @@ ALLOWED_HOSTS = [
     h.strip()
     for h in os.environ.get(
         "ALLOWED_HOSTS",
-        "felipevillegas.com,www.felipevillegas.com,.railway.app",
+        "felipevillegas.com,www.felipevillegas.com",
     ).split(",")
     if h.strip()
 ]
