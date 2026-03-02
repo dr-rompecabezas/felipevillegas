@@ -4,11 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}Felipe Villegas{% endblock %}</title>
-  <meta name="description" content="{% block meta_description %}Felipe Villegas — Learning & Development and Software Engineering{% endblock %}">
-  
-  <!-- Tailwind CSS -->
+  <meta name="description" content="{% block meta_description %}Felipe Villegas — Learning Design & Technology{% endblock %}">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
   <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
-  
+
   <!-- Favicons -->
   <link rel="icon" type="image/png" href="{% static 'images/favicon-96x96.png' %}" sizes="96x96" />
   <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}" />
@@ -16,39 +21,36 @@
   <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/apple-touch-icon.png' %}" />
   <meta name="apple-mobile-web-app-title" content="F. Villegas" />
   <link rel="manifest" href="{% static 'images/site.webmanifest' %}" />
-  
+
   {% block extra_head %}{% endblock %}
 </head>
-<body class="h-full bg-white text-gray-900 flex flex-col">
+<body class="h-full bg-surface text-ink font-sans flex flex-col">
 
   <!-- Navigation -->
-  <header class="border-b border-gray-100">
-    <nav class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
-      <a href="/" class="text-lg font-semibold tracking-tight hover:text-gray-600 transition-colors">
-        Felipe Villegas
+  <header class="border-b border-warm-200 bg-surface sticky top-0 z-50">
+    <nav class="max-w-6xl mx-auto px-6 lg:px-10 flex items-center justify-between h-14">
+
+      <!-- Wordmark -->
+      <a href="/" class="flex items-center gap-3">
+        <span class="font-display italic text-xl leading-none">FV</span>
+        <span class="hidden md:block text-[0.625rem] tracking-editorial uppercase text-warm-400">
+          Learning Design + Technology
+        </span>
       </a>
-      <ul class="flex items-center gap-6 text-sm font-medium">
+
+      <!-- Nav links -->
+      <ul class="flex items-center gap-7">
         <li>
-          <a href="/" class="hover:text-gray-600 transition-colors {% if request.path == '/' %}text-black{% else %}text-gray-500{% endif %}">
-            Home
-          </a>
+          <a href="/work/" class="nav-link {% if '/work' in request.path %}active{% endif %}">Work</a>
         </li>
         <li>
-          <a href="/work/" class="hover:text-gray-600 transition-colors {% if '/work' in request.path %}text-black{% else %}text-gray-500{% endif %}">
-            Work
-          </a>
+          <a href="/photography/" class="nav-link {% if '/photography' in request.path %}active{% endif %}">Photography</a>
         </li>
         <li>
-          <a href="/photography/" class="hover:text-gray-600 transition-colors {% if '/photography' in request.path %}text-black{% else %}text-gray-500{% endif %}">
-            Photography
-          </a>
-        </li>
-        <li>
-          <a href="/contact/" class="hover:text-gray-600 transition-colors {% if '/contact' in request.path %}text-black{% else %}text-gray-500{% endif %}">
-            Contact
-          </a>
+          <a href="/contact/" class="nav-link {% if '/contact' in request.path %}active{% endif %}">Contact</a>
         </li>
       </ul>
+
     </nav>
   </header>
 
@@ -58,13 +60,27 @@
   </main>
 
   <!-- Footer -->
-  <footer class="border-t border-gray-100 py-8">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
-      <p>&copy; {% now "Y" %} Felipe Villegas. All rights reserved.</p>
-      <ul class="flex items-center gap-4">
-        <li><a href="https://linkedin.com/in/felipevillegas" class="hover:text-gray-900 transition-colors" target="_blank" rel="noopener">LinkedIn</a></li>
-        <li><a href="https://github.com/dr-rompecabezas" class="hover:text-gray-900 transition-colors" target="_blank" rel="noopener">GitHub</a></li>
-        <li><a href="https://thinkelearn.com" class="hover:text-gray-900 transition-colors" target="_blank" rel="noopener">THINK eLearn</a></li>
+  <footer class="border-t border-warm-200 py-10">
+    <div class="max-w-6xl mx-auto px-6 lg:px-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+      <p class="text-[0.625rem] tracking-editorial uppercase text-warm-400">
+        &copy; {% now "Y" %} Felipe Villegas
+      </p>
+      <ul class="flex items-center gap-7">
+        <li>
+          <a href="https://linkedin.com/in/felipevillegas"
+             class="text-[0.625rem] tracking-editorial uppercase text-warm-500 hover:text-ink transition-colors"
+             target="_blank" rel="noopener">LinkedIn</a>
+        </li>
+        <li>
+          <a href="https://github.com/dr-rompecabezas"
+             class="text-[0.625rem] tracking-editorial uppercase text-warm-500 hover:text-ink transition-colors"
+             target="_blank" rel="noopener">GitHub</a>
+        </li>
+        <li>
+          <a href="https://thinkelearn.com"
+             class="text-[0.625rem] tracking-editorial uppercase text-warm-500 hover:text-ink transition-colors"
+             target="_blank" rel="noopener">THINK eLearn</a>
+        </li>
       </ul>
     </div>
   </footer>

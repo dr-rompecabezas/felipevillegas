@@ -1,80 +1,148 @@
 {% extends "base.html" %}
 {% load wagtailcore_tags wagtailimages_tags %}
 
-{% block title %}{{ page.title }} — Felipe Villegas{% endblock %}
+{% block title %}Felipe Villegas — Learning Design & Technology{% endblock %}
 
 {% block content %}
   {% for block in page.body %}
 
     {% if block.block_type == "hero" %}
-    <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
-      <h1 class="text-5xl sm:text-6xl font-bold tracking-tight mb-6">{{ block.value.heading }}</h1>
-      <p class="text-xl text-gray-500 max-w-2xl mb-10">{{ block.value.subtitle }}</p>
-      <div class="flex flex-wrap gap-4">
-        {% if block.value.cta_primary.url %}
-        <a href="{{ block.value.cta_primary.url }}" class="inline-flex items-center px-6 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-700 transition-colors">
-          {{ block.value.cta_primary.text }}
-        </a>
-        {% endif %}
-        {% if block.value.cta_secondary.url %}
-        <a href="{{ block.value.cta_secondary.url }}" class="inline-flex items-center px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:border-gray-500 hover:text-gray-900 transition-colors">
-          {{ block.value.cta_secondary.text }}
-        </a>
-        {% endif %}
-      </div>
-    </section>
+    <section class="max-w-6xl mx-auto px-6 lg:px-10 pt-20 pb-24 sm:pt-28 sm:pb-32">
 
-    {% elif block.block_type == "about" %}
-    <section class="border-t border-gray-100">
-      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-        <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-widest mb-6">About</h2>
-        <div class="prose prose-lg max-w-2xl">
-          {{ block.value.content }}
+      <p class="section-label fade-up mb-10">Portfolio</p>
+
+      <h1 class="fade-up-1 text-balance font-display font-normal text-ink leading-[1.06] tracking-[-0.01em] max-w-[900px]"
+          style="font-size:clamp(2.75rem,8vw,5.5rem);">
+        {{ block.value.heading }}
+      </h1>
+
+      <div class="fade-up-2 border-t border-warm-200 my-10"></div>
+
+      <div class="fade-up-2 flex flex-col sm:flex-row sm:items-center justify-between gap-8">
+        <p class="text-lg font-light leading-relaxed max-w-xl text-warm-600">
+          {{ block.value.subtitle }}
+        </p>
+        <div class="flex items-center gap-8 shrink-0">
+          {% if block.value.cta_primary.url %}
+          <a href="{{ block.value.cta_primary.url }}" class="arrow-link text-ink hover:text-accent">
+            {{ block.value.cta_primary.text }}
+            <span class="arrow">→</span>
+          </a>
+          {% endif %}
+          {% if block.value.cta_secondary.url %}
+          <a href="{{ block.value.cta_secondary.url }}" class="arrow-link text-warm-500 hover:text-ink">
+            {{ block.value.cta_secondary.text }}
+            <span class="arrow">→</span>
+          </a>
+          {% endif %}
         </div>
       </div>
+
     </section>
 
     {% elif block.block_type == "featured_work" %}
-    <section class="border-t border-gray-100 bg-gray-50">
-      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-        <div class="flex items-center justify-between mb-10">
-          <h2 class="text-2xl font-bold tracking-tight">{{ block.value.heading }}</h2>
-          <a href="/work/" class="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">View all →</a>
+    <section class="border-t border-warm-200">
+      <div class="max-w-6xl mx-auto px-6 lg:px-10 py-16 sm:py-20">
+
+        <div class="flex items-end justify-between mb-12">
+          <div>
+            <p class="section-label mb-3">{{ block.value.heading }}</p>
+            <div class="w-10 h-px bg-accent"></div>
+          </div>
+          <a href="/work/" class="arrow-link text-warm-500 hover:text-ink">
+            All work <span class="arrow">→</span>
+          </a>
         </div>
+
         {% if featured_projects %}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {% for project in featured_projects %}
-          <a href="{{ project.url }}" class="group block bg-white rounded-xl border border-gray-200 p-6 hover:border-gray-400 hover:shadow-sm transition-all">
-            <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-2">{{ project.get_primary_domain_display }}</p>
-            <h3 class="text-base font-semibold mb-2 group-hover:text-gray-600 transition-colors">{{ project.title }}</h3>
-            <p class="text-sm text-gray-500 line-clamp-2">{{ project.tagline }}</p>
+          <a href="{{ project.url }}" class="project-card group">
+
+            {% if project.hero_image %}
+            <div class="overflow-hidden bg-warm-100 aspect-[16/10]">
+              {% image project.hero_image fill-640x400 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" %}
+            </div>
+            {% else %}
+            <div class="flex items-center justify-center bg-warm-100 aspect-[16/10]">
+              <span class="font-display italic text-4xl text-warm-300">
+                {{ forloop.counter|stringformat:"02d" }}
+              </span>
+            </div>
+            {% endif %}
+
+            <div class="p-5">
+              <div class="flex items-center justify-between mb-2.5">
+                <span class="tag-domain">{{ project.get_primary_domain_display }}</span>
+                <span class="text-sm text-accent opacity-0 group-hover:opacity-100 transition-opacity duration-200">→</span>
+              </div>
+              <h3 class="font-display text-base font-normal text-ink leading-snug mb-2 transition-colors duration-200 group-hover:text-accent">
+                {{ project.title }}
+              </h3>
+              <p class="text-sm leading-relaxed line-clamp-2 text-warm-500">
+                {{ project.tagline }}
+              </p>
+            </div>
+
           </a>
           {% endfor %}
         </div>
         {% endif %}
+
+      </div>
+    </section>
+
+    {% elif block.block_type == "about" %}
+    <section class="border-t border-warm-200">
+      <div class="max-w-6xl mx-auto px-6 lg:px-10 py-16 sm:py-20">
+        <div class="grid grid-cols-1 sm:grid-cols-[140px_1fr] lg:grid-cols-[180px_1fr] gap-8 lg:gap-16">
+          <div class="pt-0.5">
+            <p class="section-label">About</p>
+          </div>
+          <div class="editorial-body max-w-2xl">
+            {{ block.value.content }}
+          </div>
+        </div>
       </div>
     </section>
 
     {% elif block.block_type == "skills" %}
-    <section class="border-t border-gray-100">
-      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-        <h2 class="text-2xl font-bold tracking-tight mb-8">{{ block.value.heading }}</h2>
-        <div class="flex flex-wrap gap-2">
-          {% for skill in block.value.skills %}
-          <span class="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">{{ skill }}</span>
-          {% endfor %}
+    <section class="border-t border-warm-200">
+      <div class="max-w-6xl mx-auto px-6 lg:px-10 py-16 sm:py-20">
+        <div class="grid grid-cols-1 sm:grid-cols-[140px_1fr] lg:grid-cols-[180px_1fr] gap-8 lg:gap-16">
+          <div class="pt-0.5">
+            <p class="section-label">{{ block.value.heading }}</p>
+          </div>
+          <div class="flex flex-wrap items-baseline">
+            {% for skill in block.value.skills %}
+            <span class="text-sm text-warm-600">{{ skill }}</span>{% if not forloop.last %}<span class="mx-3 text-xs text-warm-300">·</span>{% endif %}
+            {% endfor %}
+          </div>
         </div>
       </div>
     </section>
 
     {% elif block.block_type == "contact_cta" %}
-    <section class="border-t border-gray-100 bg-gray-900 text-white">
-      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 text-center">
-        <h2 class="text-3xl font-bold tracking-tight mb-4">{{ block.value.heading }}</h2>
-        <p class="text-gray-400 mb-8 max-w-xl mx-auto">{{ block.value.message }}</p>
-        <a href="/contact/" class="inline-flex items-center px-6 py-3 bg-white text-gray-900 font-medium rounded-lg hover:bg-gray-100 transition-colors">
-          Get in touch
-        </a>
+    <section class="border-t border-warm-200 bg-ink">
+      <div class="max-w-6xl mx-auto px-6 lg:px-10 py-20 sm:py-24">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+
+          <h2 class="font-display font-normal text-surface leading-[1.1]"
+              style="font-size:clamp(2rem,5vw,3rem);">
+            {{ block.value.heading }}
+          </h2>
+
+          <div>
+            <p class="text-lg font-light leading-relaxed mb-10 text-warm-600">
+              {{ block.value.message }}
+            </p>
+            <a href="/contact/" class="arrow-link text-accent hover:text-surface transition-colors">
+              Get in touch
+              <span class="arrow text-base">→</span>
+            </a>
+          </div>
+
+        </div>
       </div>
     </section>
     {% endif %}

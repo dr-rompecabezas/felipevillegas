@@ -4,35 +4,54 @@
 {% block title %}Photography — Felipe Villegas{% endblock %}
 
 {% block content %}
-<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-  <h1 class="text-4xl font-bold tracking-tight mb-4">{{ page.title }}</h1>
-  <p class="text-gray-500 mb-12">Landscape, wildlife, urban, and event photography.</p>
+<div class="max-w-6xl mx-auto px-6 lg:px-10 py-16 sm:py-20">
+
+  <header class="mb-16 fade-up">
+    <p class="section-label mb-4">Photography</p>
+    <h1 class="font-display font-normal text-ink leading-[1.1] tracking-[-0.01em]"
+        style="font-size:clamp(2.5rem,6vw,4rem);">
+      {{ page.title }}
+    </h1>
+  </header>
 
   {% if galleries %}
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
     {% for gallery in galleries %}
-    <a href="{{ gallery.url }}" class="group block rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition-all">
+    <a href="{{ gallery.url }}" class="group block overflow-hidden bg-warm-100">
+
       {% if gallery.cover_image %}
-      <div class="aspect-video overflow-hidden bg-gray-100">
-        {% image gallery.cover_image fill-600x400 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" %}
+      <div class="overflow-hidden aspect-[4/3]">
+        {% image gallery.cover_image fill-600x450 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" %}
       </div>
       {% else %}
-      <div class="aspect-video bg-gray-100 flex items-center justify-center">
-        <span class="text-gray-300 text-4xl">📷</span>
+      <div class="flex items-center justify-center aspect-[4/3] bg-warm-200">
+        <span class="font-display italic text-4xl text-warm-300">
+          {{ forloop.counter|stringformat:"02d" }}
+        </span>
       </div>
       {% endif %}
-      <div class="p-4">
-        <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">{{ gallery.get_category_display }}</p>
-        <h2 class="text-base font-semibold group-hover:text-gray-600 transition-colors">{{ gallery.title }}</h2>
+
+      <div class="p-4 bg-white border-t border-warm-200">
+        <p class="section-label mb-1.5">{{ gallery.get_category_display }}</p>
+        <h2 class="font-display text-base font-normal text-ink leading-snug transition-colors duration-200 group-hover:text-accent">
+          {{ gallery.title }}
+        </h2>
         {% if gallery.description %}
-        <p class="text-sm text-gray-500 mt-1 line-clamp-2">{{ gallery.description }}</p>
+        <p class="text-xs leading-relaxed mt-1.5 line-clamp-2 text-warm-400">
+          {{ gallery.description }}
+        </p>
         {% endif %}
       </div>
+
     </a>
     {% endfor %}
   </div>
+
   {% else %}
-  <p class="text-gray-400 text-center py-16">No galleries yet. Check back soon.</p>
+  <p class="font-display italic text-lg text-warm-400 text-center py-20">
+    No galleries yet. Check back soon.
+  </p>
   {% endif %}
+
 </div>
 {% endblock %}
