@@ -7,11 +7,10 @@
 <div class="max-w-6xl mx-auto px-6 lg:px-10 py-16 sm:py-20">
 
   <!-- Breadcrumb -->
-  <nav class="flex items-center gap-2 mb-14"
-       style="font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;color:#B8B3A8;">
-    <a href="/photography/" class="hover:text-ink transition-colors" style="transition:color 0.2s;">Photography</a>
-    <span style="color:#D4CFC5;">/</span>
-    <span style="color:#8A8880;">{{ page.title }}</span>
+  <nav class="flex items-center gap-2 mb-14 text-[0.625rem] tracking-[0.18em] uppercase text-warm-400">
+    <a href="/photography/" class="hover:text-ink transition-colors">Photography</a>
+    <span class="text-warm-300">/</span>
+    <span class="text-warm-500">{{ page.title }}</span>
   </nav>
 
   <!-- Header -->
@@ -20,11 +19,12 @@
       <p class="section-label">{{ page.get_category_display }}</p>
     </div>
     <div>
-      <h1 style="font-family:'Playfair Display',Georgia,serif;font-size:clamp(2rem,5vw,3.25rem);line-height:1.1;font-weight:400;color:#1A1A18;margin-bottom:1rem;">
+      <h1 class="font-display font-normal text-ink leading-[1.1] mb-4"
+          style="font-size:clamp(2rem,5vw,3.25rem);">
         {{ page.title }}
       </h1>
       {% if page.description %}
-      <p class="text-lg font-light leading-relaxed max-w-2xl" style="color:#5C5A54;font-weight:300;">
+      <p class="text-lg font-light leading-relaxed max-w-2xl text-warm-600">
         {{ page.description }}
       </p>
       {% endif %}
@@ -43,15 +43,14 @@
     {% endfor %}
   </div>
   {% else %}
-  <p style="font-family:'Playfair Display',Georgia,serif;font-style:italic;font-size:1.125rem;color:#B8B3A8;text-align:center;padding:5rem 0;">
+  <p class="font-display italic text-lg text-warm-400 text-center py-20">
     No photos in this gallery yet.
   </p>
   {% endif %}
 
   <!-- Back link -->
-  <div class="mt-20 pt-10 border-t border-warm-200" style="border-color:#E8E4DC;">
-    <a href="/photography/"
-       class="arrow-link back-link hover:text-ink" style="color:#8A8880;">
+  <div class="mt-20 pt-10 border-t border-warm-200">
+    <a href="/photography/" class="arrow-link back-link text-warm-500 hover:text-ink">
       <span class="arrow">←</span> All Photography
     </a>
   </div>

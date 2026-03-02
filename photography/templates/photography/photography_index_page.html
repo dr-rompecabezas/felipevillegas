@@ -8,7 +8,8 @@
 
   <header class="mb-16 fade-up">
     <p class="section-label mb-4">Photography</p>
-    <h1 style="font-family:'Playfair Display',Georgia,serif;font-size:clamp(2.5rem,6vw,4rem);line-height:1.1;font-weight:400;letter-spacing:-0.01em;color:#1A1A18;">
+    <h1 class="font-display font-normal text-ink leading-[1.1] tracking-[-0.01em]"
+        style="font-size:clamp(2.5rem,6vw,4rem);">
       {{ page.title }}
     </h1>
   </header>
@@ -16,29 +17,27 @@
   {% if galleries %}
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
     {% for gallery in galleries %}
-    <a href="{{ gallery.url }}" class="group block overflow-hidden bg-warm-100"
-       style="background-color:#F5EFE6;">
+    <a href="{{ gallery.url }}" class="group block overflow-hidden bg-warm-100">
 
       {% if gallery.cover_image %}
-      <div class="overflow-hidden" style="aspect-ratio:4/3;">
+      <div class="overflow-hidden aspect-[4/3]">
         {% image gallery.cover_image fill-600x450 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" %}
       </div>
       {% else %}
-      <div class="flex items-center justify-center" style="aspect-ratio:4/3;background:#E8E4DC;">
-        <span style="font-family:'Playfair Display',Georgia,serif;font-style:italic;font-size:2.5rem;color:#D4CFC5;">
+      <div class="flex items-center justify-center aspect-[4/3] bg-warm-200">
+        <span class="font-display italic text-4xl text-warm-300">
           {{ forloop.counter|stringformat:"02d" }}
         </span>
       </div>
       {% endif %}
 
-      <div class="p-4 border-t border-warm-200" style="border-color:#E8E4DC;background:#FFFFFF;">
+      <div class="p-4 bg-white border-t border-warm-200">
         <p class="section-label mb-1.5">{{ gallery.get_category_display }}</p>
-        <h2 class="leading-snug transition-colors duration-200 group-hover:text-accent"
-            style="font-family:'Playfair Display',Georgia,serif;font-size:1rem;font-weight:400;color:#1A1A18;">
+        <h2 class="font-display text-base font-normal text-ink leading-snug transition-colors duration-200 group-hover:text-accent">
           {{ gallery.title }}
         </h2>
         {% if gallery.description %}
-        <p class="text-xs leading-relaxed mt-1.5 line-clamp-2" style="color:#B8B3A8;">
+        <p class="text-xs leading-relaxed mt-1.5 line-clamp-2 text-warm-400">
           {{ gallery.description }}
         </p>
         {% endif %}
@@ -49,7 +48,7 @@
   </div>
 
   {% else %}
-  <p style="font-family:'Playfair Display',Georgia,serif;font-style:italic;font-size:1.125rem;color:#B8B3A8;text-align:center;padding:5rem 0;">
+  <p class="font-display italic text-lg text-warm-400 text-center py-20">
     No galleries yet. Check back soon.
   </p>
   {% endif %}

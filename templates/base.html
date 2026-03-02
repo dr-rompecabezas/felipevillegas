@@ -24,16 +24,16 @@
 
   {% block extra_head %}{% endblock %}
 </head>
-<body class="h-full bg-surface text-ink font-sans flex flex-col" style="background-color:#FAF7F2;color:#1A1A18;font-family:'DM Sans',system-ui,sans-serif;">
+<body class="h-full bg-surface text-ink font-sans flex flex-col">
 
   <!-- Navigation -->
-  <header class="border-b border-warm-200 bg-surface sticky top-0 z-50" style="background-color:#FAF7F2;border-bottom-color:#E8E4DC;">
+  <header class="border-b border-warm-200 bg-surface sticky top-0 z-50">
     <nav class="max-w-6xl mx-auto px-6 lg:px-10 flex items-center justify-between h-14">
 
       <!-- Wordmark -->
       <a href="/" class="flex items-center gap-3">
-        <span class="font-display italic text-xl leading-none" style="font-family:'Playfair Display',Georgia,serif;font-style:italic;">FV</span>
-        <span class="hidden md:block text-warm-400 font-sans" style="font-size:0.625rem;letter-spacing:0.2em;text-transform:uppercase;color:#B8B3A8;">
+        <span class="font-display italic text-xl leading-none">FV</span>
+        <span class="hidden md:block text-[0.625rem] tracking-editorial uppercase text-warm-400">
           Learning Design + Technology
         </span>
       </a>
@@ -41,19 +41,13 @@
       <!-- Nav links -->
       <ul class="flex items-center gap-7">
         <li>
-          <a href="/work/" class="nav-link {% if '/work' in request.path %}active{% endif %}">
-            Work
-          </a>
+          <a href="/work/" class="nav-link {% if '/work' in request.path %}active{% endif %}">Work</a>
         </li>
         <li>
-          <a href="/photography/" class="nav-link {% if '/photography' in request.path %}active{% endif %}">
-            Photography
-          </a>
+          <a href="/photography/" class="nav-link {% if '/photography' in request.path %}active{% endif %}">Photography</a>
         </li>
         <li>
-          <a href="/contact/" class="nav-link {% if '/contact' in request.path %}active{% endif %}">
-            Contact
-          </a>
+          <a href="/contact/" class="nav-link {% if '/contact' in request.path %}active{% endif %}">Contact</a>
         </li>
       </ul>
 
@@ -66,28 +60,25 @@
   </main>
 
   <!-- Footer -->
-  <footer class="border-t border-warm-200 py-10" style="border-top-color:#E8E4DC;">
+  <footer class="border-t border-warm-200 py-10">
     <div class="max-w-6xl mx-auto px-6 lg:px-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
-      <p style="font-size:0.625rem;letter-spacing:0.2em;text-transform:uppercase;color:#B8B3A8;">
+      <p class="text-[0.625rem] tracking-editorial uppercase text-warm-400">
         &copy; {% now "Y" %} Felipe Villegas
       </p>
       <ul class="flex items-center gap-7">
         <li>
           <a href="https://linkedin.com/in/felipevillegas"
-             style="font-size:0.625rem;letter-spacing:0.2em;text-transform:uppercase;color:#8A8880;transition:color 0.2s;"
-             class="hover:text-ink"
+             class="text-[0.625rem] tracking-editorial uppercase text-warm-500 hover:text-ink transition-colors"
              target="_blank" rel="noopener">LinkedIn</a>
         </li>
         <li>
           <a href="https://github.com/dr-rompecabezas"
-             style="font-size:0.625rem;letter-spacing:0.2em;text-transform:uppercase;color:#8A8880;transition:color 0.2s;"
-             class="hover:text-ink"
+             class="text-[0.625rem] tracking-editorial uppercase text-warm-500 hover:text-ink transition-colors"
              target="_blank" rel="noopener">GitHub</a>
         </li>
         <li>
           <a href="https://thinkelearn.com"
-             style="font-size:0.625rem;letter-spacing:0.2em;text-transform:uppercase;color:#8A8880;transition:color 0.2s;"
-             class="hover:text-ink"
+             class="text-[0.625rem] tracking-editorial uppercase text-warm-500 hover:text-ink transition-colors"
              target="_blank" rel="noopener">THINK eLearn</a>
         </li>
       </ul>

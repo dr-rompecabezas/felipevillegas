@@ -8,34 +8,31 @@
 
   <header class="mb-16 fade-up">
     <p class="section-label mb-4">Selected Work</p>
-    <h1 style="font-family:'Playfair Display',Georgia,serif;font-size:clamp(2.5rem,6vw,4rem);line-height:1.1;font-weight:400;letter-spacing:-0.01em;color:#1A1A18;">
+    <h1 class="font-display font-normal text-ink leading-[1.1] tracking-[-0.01em]"
+        style="font-size:clamp(2.5rem,6vw,4rem);">
       {{ page.title }}
     </h1>
   </header>
 
   <!-- Domain filter -->
-  <div class="flex flex-wrap items-center gap-5 mb-14 border-t border-b border-warm-200 py-4" style="border-color:#E8E4DC;">
+  <div class="flex flex-wrap items-center gap-5 mb-14 border-t border-b border-warm-200 py-4">
     <a href="{{ page.url }}"
-       style="font-size:0.6875rem;letter-spacing:0.14em;text-transform:uppercase;font-weight:500;transition:color 0.2s;
-              {% if not current_domain %}color:#1A1A18;{% else %}color:#B8B3A8;{% endif %}">
+       class="text-[0.6875rem] tracking-editorial-sm uppercase font-medium transition-colors {% if not current_domain %}text-ink{% else %}text-warm-400 hover:text-ink{% endif %}">
       All
     </a>
-    <span style="color:#D4CFC5;font-size:0.6875rem;">·</span>
+    <span class="text-warm-300 text-[0.6875rem]">·</span>
     <a href="{{ page.url }}?domain=ld"
-       style="font-size:0.6875rem;letter-spacing:0.14em;text-transform:uppercase;font-weight:500;transition:color 0.2s;
-              {% if current_domain == 'ld' %}color:#1A1A18;{% else %}color:#B8B3A8;{% endif %}">
+       class="text-[0.6875rem] tracking-editorial-sm uppercase font-medium transition-colors {% if current_domain == 'ld' %}text-ink{% else %}text-warm-400 hover:text-ink{% endif %}">
       L&amp;D
     </a>
-    <span style="color:#D4CFC5;font-size:0.6875rem;">·</span>
+    <span class="text-warm-300 text-[0.6875rem]">·</span>
     <a href="{{ page.url }}?domain=software"
-       style="font-size:0.6875rem;letter-spacing:0.14em;text-transform:uppercase;font-weight:500;transition:color 0.2s;
-              {% if current_domain == 'software' %}color:#1A1A18;{% else %}color:#B8B3A8;{% endif %}">
+       class="text-[0.6875rem] tracking-editorial-sm uppercase font-medium transition-colors {% if current_domain == 'software' %}text-ink{% else %}text-warm-400 hover:text-ink{% endif %}">
       Software
     </a>
-    <span style="color:#D4CFC5;font-size:0.6875rem;">·</span>
+    <span class="text-warm-300 text-[0.6875rem]">·</span>
     <a href="{{ page.url }}?domain=hybrid"
-       style="font-size:0.6875rem;letter-spacing:0.14em;text-transform:uppercase;font-weight:500;transition:color 0.2s;
-              {% if current_domain == 'hybrid' %}color:#1A1A18;{% else %}color:#B8B3A8;{% endif %}">
+       class="text-[0.6875rem] tracking-editorial-sm uppercase font-medium transition-colors {% if current_domain == 'hybrid' %}text-ink{% else %}text-warm-400 hover:text-ink{% endif %}">
       Hybrid
     </a>
   </div>
@@ -47,12 +44,12 @@
     <a href="{{ project.url }}" class="project-card group">
 
       {% if project.hero_image %}
-      <div class="overflow-hidden bg-warm-100" style="aspect-ratio:16/10;">
+      <div class="overflow-hidden bg-warm-100 aspect-[16/10]">
         {% image project.hero_image fill-720x450 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" %}
       </div>
       {% else %}
-      <div class="flex items-center justify-center bg-warm-100" style="aspect-ratio:16/10;">
-        <span style="font-family:'Playfair Display',Georgia,serif;font-style:italic;font-size:3rem;color:#D4CFC5;">
+      <div class="flex items-center justify-center bg-warm-100 aspect-[16/10]">
+        <span class="font-display italic text-5xl text-warm-300">
           {{ forloop.counter|stringformat:"02d" }}
         </span>
       </div>
@@ -63,20 +60,21 @@
           <span class="tag-domain">{{ project.get_primary_domain_display }}</span>
           <span class="tag-status">{{ project.get_status_display }}</span>
         </div>
-        <h2 class="leading-snug mb-2 transition-colors duration-200 group-hover:text-accent"
-            style="font-family:'Playfair Display',Georgia,serif;font-size:1.25rem;font-weight:400;color:#1A1A18;">
+        <h2 class="font-display text-xl font-normal text-ink leading-snug mb-2 transition-colors duration-200 group-hover:text-accent">
           {{ project.title }}
         </h2>
-        <p class="text-sm leading-relaxed mb-4 line-clamp-2" style="color:#8A8880;">
+        <p class="text-sm leading-relaxed mb-4 line-clamp-2 text-warm-500">
           {{ project.tagline }}
         </p>
-        {% if project.tech_stack.all %}
-        <div class="flex flex-wrap gap-1.5 pt-4 border-t border-warm-100" style="border-color:#F5EFE6;">
-          {% for tag in project.tech_stack.all %}
+        {% with tags=project.tech_stack.all %}
+        {% if tags %}
+        <div class="flex flex-wrap gap-1.5 pt-4 border-t border-warm-100">
+          {% for tag in tags %}
           <span class="tech-tag">{{ tag.name }}</span>
           {% endfor %}
         </div>
         {% endif %}
+        {% endwith %}
       </div>
 
     </a>
@@ -84,7 +82,7 @@
   </div>
 
   {% else %}
-  <p style="font-family:'Playfair Display',Georgia,serif;font-style:italic;font-size:1.125rem;color:#B8B3A8;text-align:center;padding:5rem 0;">
+  <p class="font-display italic text-lg text-warm-400 text-center py-20">
     No projects in this category.
   </p>
   {% endif %}

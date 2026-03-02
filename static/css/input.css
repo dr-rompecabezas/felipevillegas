@@ -8,24 +8,21 @@
   }
 
   body {
-    background-color: #FAF7F2;
-    color: #1A1A18;
+    @apply bg-surface text-ink;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   ::selection {
-    background-color: #C4622D;
-    color: #FAF7F2;
+    @apply bg-accent text-surface;
   }
 
-  /* Prose-like styles for rich text blocks */
+  /* Rich text blocks rendered by Wagtail */
   .editorial-body h1,
   .editorial-body h2,
   .editorial-body h3,
   .editorial-body h4 {
-    font-family: "Playfair Display", Georgia, serif;
-    color: #1A1A18;
+    @apply font-display text-ink;
     line-height: 1.2;
     margin-top: 2em;
     margin-bottom: 0.75em;
@@ -35,103 +32,98 @@
   .editorial-body h3 { font-size: 1.25rem; }
 
   .editorial-body p {
-    color: #3A3835;
+    @apply text-warm-700;
     line-height: 1.8;
     margin-bottom: 1.25em;
     font-size: 1rem;
   }
 
   .editorial-body a {
-    color: #C4622D;
+    @apply text-accent;
     text-decoration: none;
-    border-bottom: 1px solid #C4622D33;
+    border-bottom: 1px solid rgb(196 98 45 / 0.2);
     transition: border-color 0.2s;
   }
   .editorial-body a:hover {
-    border-color: #C4622D;
+    @apply border-accent;
   }
 
   .editorial-body ul,
   .editorial-body ol {
+    @apply text-warm-700;
     padding-left: 1.5em;
     margin-bottom: 1.25em;
-    color: #3A3835;
     line-height: 1.8;
   }
   .editorial-body li { margin-bottom: 0.4em; }
 
   .editorial-body blockquote {
-    border-left: 2px solid #C4622D;
+    @apply font-display text-warm-600 border-accent;
+    border-left-width: 2px;
+    border-left-style: solid;
     padding-left: 1.5em;
     margin-left: 0;
-    color: #5C5A54;
     font-style: italic;
-    font-family: "Playfair Display", Georgia, serif;
   }
 
   .editorial-body strong {
-    color: #1A1A18;
+    @apply text-ink;
     font-weight: 500;
   }
 }
 
 @layer components {
   .section-label {
-    font-family: "DM Sans", system-ui, sans-serif;
+    @apply text-muted;
     font-size: 0.625rem;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     font-weight: 500;
-    color: #8A8880;
     display: block;
   }
 
   .nav-link {
-    font-family: "DM Sans", system-ui, sans-serif;
+    @apply text-warm-600;
     font-size: 0.6875rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     font-weight: 500;
-    color: #5C5A54;
     transition: color 0.2s;
     position: relative;
   }
-  .nav-link:hover { color: #1A1A18; }
-  .nav-link.active { color: #C4622D; }
+  .nav-link:hover { @apply text-ink; }
+  .nav-link.active { @apply text-accent; }
 
   .tag-domain {
+    @apply text-accent;
     font-size: 0.625rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     font-weight: 500;
-    color: #C4622D;
   }
 
   .tag-status {
+    @apply text-muted;
     font-size: 0.625rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: #8A8880;
   }
 
   .tech-tag {
+    @apply border border-warm-200 text-muted;
     font-size: 0.625rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     padding: 0.2em 0.5em;
-    border: 1px solid #E8E4DC;
-    color: #8A8880;
   }
 
   .project-card {
-    background-color: #ffffff;
-    border: 1px solid #E8E4DC;
+    @apply bg-white border border-warm-200;
     transition: border-color 0.25s, box-shadow 0.25s;
     display: block;
   }
   .project-card:hover {
-    border-color: #B8B3A8;
-    box-shadow: 0 4px 24px rgba(26, 26, 24, 0.07);
+    @apply border-warm-400 shadow-card;
   }
 
   .arrow-link {
