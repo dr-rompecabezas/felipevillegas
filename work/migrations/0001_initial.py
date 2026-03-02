@@ -7,57 +7,110 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('wagtailcore', '0096_referenceindex_referenceindex_source_object_and_more'),
-        ('wagtailimages', '0027_image_description'),
+        ("wagtailcore", "0096_referenceindex_referenceindex_source_object_and_more"),
+        ("wagtailimages", "0027_image_description"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='TechTag',
+            name="TechTag",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('slug', models.SlugField(unique=True)),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("name", models.CharField(max_length=100)),
+                ("slug", models.SlugField(unique=True)),
             ],
             options={
-                'ordering': ['name'],
+                "ordering": ["name"],
             },
         ),
         migrations.CreateModel(
-            name='WorkIndexPage',
+            name="WorkIndexPage",
             fields=[
-                ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.page')),
+                (
+                    "page_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="wagtailcore.page",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
-            bases=('wagtailcore.page',),
+            bases=("wagtailcore.page",),
         ),
         migrations.CreateModel(
-            name='ProjectPage',
+            name="ProjectPage",
             fields=[
-                ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.page')),
-                ('tagline', models.CharField(max_length=250)),
-                ('role', models.CharField(max_length=150)),
-                ('client_context', models.CharField(max_length=250)),
-                ('status', models.CharField(choices=[('production', 'Production'), ('open_source', 'Open Source'), ('archived', 'Archived')], max_length=20)),
-                ('primary_domain', models.CharField(choices=[('ld', 'L&D'), ('software', 'Software'), ('hybrid', 'Hybrid')], max_length=20)),
-                ('body', wagtail.fields.StreamField([('rich_text', 0), ('image', 1)], blank=True, block_lookup={0: ('wagtail.blocks.RichTextBlock', (), {}), 1: ('wagtail.images.blocks.ImageChooserBlock', (), {})})),
-                ('outcome', models.TextField(blank=True)),
-                ('link_github', models.URLField(blank=True)),
-                ('link_live', models.URLField(blank=True)),
-                ('link_pypi', models.URLField(blank=True)),
-                ('featured', models.BooleanField(default=False)),
-                ('hero_image', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='wagtailimages.image')),
-                ('tech_stack', modelcluster.fields.ParentalManyToManyField(blank=True, to='work.techtag')),
+                (
+                    "page_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="wagtailcore.page",
+                    ),
+                ),
+                ("tagline", models.CharField(max_length=250)),
+                ("role", models.CharField(max_length=150)),
+                ("client_context", models.CharField(max_length=250)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("production", "Production"),
+                            ("open_source", "Open Source"),
+                            ("archived", "Archived"),
+                        ],
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "primary_domain",
+                    models.CharField(
+                        choices=[("ld", "L&D"), ("software", "Software"), ("hybrid", "Hybrid")], max_length=20
+                    ),
+                ),
+                (
+                    "body",
+                    wagtail.fields.StreamField(
+                        [("rich_text", 0), ("image", 1)],
+                        blank=True,
+                        block_lookup={
+                            0: ("wagtail.blocks.RichTextBlock", (), {}),
+                            1: ("wagtail.images.blocks.ImageChooserBlock", (), {}),
+                        },
+                    ),
+                ),
+                ("outcome", models.TextField(blank=True)),
+                ("link_github", models.URLField(blank=True)),
+                ("link_live", models.URLField(blank=True)),
+                ("link_pypi", models.URLField(blank=True)),
+                ("featured", models.BooleanField(default=False)),
+                (
+                    "hero_image",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="+",
+                        to="wagtailimages.image",
+                    ),
+                ),
+                ("tech_stack", modelcluster.fields.ParentalManyToManyField(blank=True, to="work.techtag")),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
-            bases=('wagtailcore.page',),
+            bases=("wagtailcore.page",),
         ),
     ]

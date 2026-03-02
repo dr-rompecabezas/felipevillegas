@@ -1,14 +1,13 @@
-from django.db import models
-from wagtail.models import Page
-from wagtail.fields import StreamField
 from wagtail.admin.panels import FieldPanel
 from wagtail.blocks import (
     CharBlock,
-    TextBlock,
+    ListBlock,
     RichTextBlock,
     StructBlock,
-    ListBlock,
+    TextBlock,
 )
+from wagtail.fields import StreamField
+from wagtail.models import Page
 
 
 class CTABlock(StructBlock):
@@ -83,8 +82,8 @@ class HomePage(Page):
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)
         from work.models import ProjectPage
-        context["featured_projects"] = (
-            ProjectPage.objects.filter(featured=True, live=True)
-            .order_by("-first_published_at")[:6]
-        )
+
+        context["featured_projects"] = ProjectPage.objects.filter(featured=True, live=True).order_by(
+            "-first_published_at"
+        )[:6]
         return context

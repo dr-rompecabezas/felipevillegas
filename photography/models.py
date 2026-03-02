@@ -1,8 +1,8 @@
 from django.db import models
-from wagtail.models import Page
-from wagtail.fields import StreamField
 from wagtail.admin.panels import FieldPanel
+from wagtail.fields import StreamField
 from wagtail.images.blocks import ImageChooserBlock
+from wagtail.models import Page
 
 
 class PhotographyIndexPage(Page):
@@ -10,9 +10,7 @@ class PhotographyIndexPage(Page):
 
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)
-        context["galleries"] = (
-            GalleryPage.objects.child_of(self).live().order_by("-first_published_at")
-        )
+        context["galleries"] = GalleryPage.objects.child_of(self).live().order_by("-first_published_at")
         return context
 
 

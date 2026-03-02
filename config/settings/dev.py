@@ -1,5 +1,6 @@
-from .base import *  # noqa: F401, F403
 from decouple import config
+
+from .base import *  # noqa: F401, F403
 
 DEBUG = True
 
@@ -9,6 +10,7 @@ ALLOWED_HOSTS = ["*"]
 DATABASE_URL = config("DATABASE_URL", default="")
 if DATABASE_URL:
     import dj_database_url
+
     DATABASES = {"default": dj_database_url.parse(DATABASE_URL)}
 else:
     DATABASES = {

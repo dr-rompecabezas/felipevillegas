@@ -1,11 +1,11 @@
 from django import forms
 from django.db import models
 from modelcluster.fields import ParentalManyToManyField
-from wagtail.models import Page
-from wagtail.fields import StreamField
 from wagtail.admin.panels import FieldPanel
 from wagtail.blocks import RichTextBlock
+from wagtail.fields import StreamField
 from wagtail.images.blocks import ImageChooserBlock
+from wagtail.models import Page
 from wagtail.snippets.models import register_snippet
 
 
@@ -14,13 +14,13 @@ class TechTag(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
 
+    class Meta:
+        ordering = ["name"]
+
     panels = [FieldPanel("name"), FieldPanel("slug")]
 
     def __str__(self):
         return self.name
-
-    class Meta:
-        ordering = ["name"]
 
 
 class WorkIndexPage(Page):
@@ -30,10 +30,7 @@ class WorkIndexPage(Page):
         context = super().get_context(request, *args, **kwargs)
         domain = request.GET.get("domain", "")
         projects = (
-            ProjectPage.objects.child_of(self)
-            .live()
-            .order_by("-first_published_at")
-            .prefetch_related("tech_stack")
+            ProjectPage.objects.child_of(self).live().order_by("-first_published_at").prefetch_related("tech_stack")
         )
         if domain in ("ld", "software", "hybrid"):
             projects = projects.filter(primary_domain=domain)

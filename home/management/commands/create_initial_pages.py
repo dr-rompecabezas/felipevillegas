@@ -43,9 +43,7 @@ class Command(BaseCommand):
         home.add_child(instance=work_index)
         self.stdout.write(f"  Created WorkIndexPage: '{work_index.title}'")
 
-        photo_index = PhotographyIndexPage(
-            title="Photography", slug="photography", live=True
-        )
+        photo_index = PhotographyIndexPage(title="Photography", slug="photography", live=True)
         home.add_child(instance=photo_index)
         self.stdout.write(f"  Created PhotographyIndexPage: '{photo_index.title}'")
 
@@ -72,6 +70,7 @@ class Command(BaseCommand):
 
         # Fix any treebeard numchild inconsistencies left by deletions or add_child calls.
         from django.core.management import call_command
+
         call_command("fixtree", verbosity=0)
 
         self.stdout.write(self.style.SUCCESS("Done. Page tree is ready."))

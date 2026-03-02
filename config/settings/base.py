@@ -1,4 +1,5 @@
 from pathlib import Path
+
 from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -77,7 +78,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = "en"
-LANGUAGES = [('en', 'English')]
+LANGUAGES = [("en", "English")]
 TIME_ZONE = "America/Toronto"
 USE_I18N = True
 USE_TZ = True
