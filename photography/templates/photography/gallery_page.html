@@ -4,36 +4,57 @@
 {% block title %}{{ page.title }} — Photography — Felipe Villegas{% endblock %}
 
 {% block content %}
-<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+<div class="max-w-6xl mx-auto px-6 lg:px-10 py-16 sm:py-20">
 
   <!-- Breadcrumb -->
-  <nav class="mb-8 text-sm text-gray-400">
-    <a href="/photography/" class="hover:text-gray-700 transition-colors">Photography</a>
-    <span class="mx-2">/</span>
-    <span class="text-gray-600">{{ page.title }}</span>
+  <nav class="flex items-center gap-2 mb-14"
+       style="font-size:0.625rem;letter-spacing:0.18em;text-transform:uppercase;color:#B8B3A8;">
+    <a href="/photography/" class="hover:text-ink transition-colors" style="transition:color 0.2s;">Photography</a>
+    <span style="color:#D4CFC5;">/</span>
+    <span style="color:#8A8880;">{{ page.title }}</span>
   </nav>
 
-  <header class="mb-10">
-    <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">{{ page.get_category_display }}</p>
-    <h1 class="text-4xl font-bold tracking-tight mb-4">{{ page.title }}</h1>
-    {% if page.description %}
-    <p class="text-gray-500 max-w-2xl">{{ page.description }}</p>
-    {% endif %}
+  <!-- Header -->
+  <header class="mb-16 grid grid-cols-1 sm:grid-cols-[140px_1fr] lg:grid-cols-[180px_1fr] gap-8 lg:gap-16">
+    <div class="pt-0.5">
+      <p class="section-label">{{ page.get_category_display }}</p>
+    </div>
+    <div>
+      <h1 style="font-family:'Playfair Display',Georgia,serif;font-size:clamp(2rem,5vw,3.25rem);line-height:1.1;font-weight:400;color:#1A1A18;margin-bottom:1rem;">
+        {{ page.title }}
+      </h1>
+      {% if page.description %}
+      <p class="text-lg font-light leading-relaxed max-w-2xl" style="color:#5C5A54;font-weight:300;">
+        {{ page.description }}
+      </p>
+      {% endif %}
+    </div>
   </header>
 
+  <!-- Masonry grid -->
   {% if page.images %}
   <div class="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
-    {% for block in page.images %}
-      {% if block.block_type == "image" %}
-      <div class="break-inside-avoid">
-        {% image block.value width-800 class="w-full rounded-lg object-cover" %}
+    {% for item in page.images %}
+      {% if item.block_type == "image" %}
+      <div class="break-inside-avoid overflow-hidden">
+        {% image item.value width-800 class="w-full object-cover hover:opacity-95 transition-opacity duration-300" %}
       </div>
       {% endif %}
     {% endfor %}
   </div>
   {% else %}
-  <p class="text-gray-400 text-center py-16">No photos in this gallery yet.</p>
+  <p style="font-family:'Playfair Display',Georgia,serif;font-style:italic;font-size:1.125rem;color:#B8B3A8;text-align:center;padding:5rem 0;">
+    No photos in this gallery yet.
+  </p>
   {% endif %}
+
+  <!-- Back link -->
+  <div class="mt-20 pt-10 border-t border-warm-200" style="border-color:#E8E4DC;">
+    <a href="/photography/"
+       class="arrow-link back-link hover:text-ink" style="color:#8A8880;">
+      <span class="arrow">←</span> All Photography
+    </a>
+  </div>
 
 </div>
 {% endblock %}

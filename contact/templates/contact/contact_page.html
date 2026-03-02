@@ -3,34 +3,68 @@
 {% block title %}Contact — Felipe Villegas{% endblock %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-  <h1 class="text-4xl font-bold tracking-tight mb-4">Get in touch</h1>
-  <p class="text-gray-500 mb-12 text-lg">Whether you're building a learning experience, need a technical collaborator, or just want to connect — I'd love to hear from you.</p>
+<div class="max-w-6xl mx-auto px-6 lg:px-10 py-16 sm:py-24">
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+  <header class="mb-20 fade-up">
+    <p class="section-label mb-4">Contact</p>
+    <h1 style="font-family:'Playfair Display',Georgia,serif;font-size:clamp(2.75rem,7vw,5rem);line-height:1.06;font-weight:400;letter-spacing:-0.01em;color:#1A1A18;">
+      Get in touch
+    </h1>
+    <div class="mt-8" style="width:3.5rem;height:1px;background:#C4622D;"></div>
+  </header>
+
+  <!-- Contact grid — bordered cells -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 border-t border-l border-warm-200" style="border-color:#E8E4DC;">
 
     <!-- Email -->
     <a href="mailto:f.villegas@thinkelearn.com"
-       class="group flex flex-col gap-2 p-6 border border-gray-200 rounded-xl hover:border-gray-400 hover:shadow-sm transition-all">
-      <span class="text-xs font-semibold uppercase tracking-widest text-gray-400">Email</span>
-      <span class="text-base font-medium group-hover:text-gray-600 transition-colors">f.villegas@thinkelearn.com</span>
+       class="group flex flex-col gap-4 p-8 border-b border-r border-warm-200 transition-colors hover:bg-white"
+       style="border-color:#E8E4DC;">
+      <p class="section-label">Email</p>
+      <p class="text-base leading-relaxed transition-colors duration-200 group-hover:text-accent"
+         style="color:#1A1A18;font-weight:400;">
+        f.villegas@thinkelearn.com
+      </p>
+      <span class="mt-auto text-sm transition-colors duration-200 opacity-40 group-hover:opacity-100 group-hover:text-accent"
+            style="color:#C4622D;">↗</span>
     </a>
 
     <!-- LinkedIn -->
     <a href="https://linkedin.com/in/felipevillegas" target="_blank" rel="noopener"
-       class="group flex flex-col gap-2 p-6 border border-gray-200 rounded-xl hover:border-gray-400 hover:shadow-sm transition-all">
-      <span class="text-xs font-semibold uppercase tracking-widest text-gray-400">LinkedIn</span>
-      <span class="text-base font-medium group-hover:text-gray-600 transition-colors">linkedin.com/in/felipevillegas ↗</span>
+       class="group flex flex-col gap-4 p-8 border-b border-r border-warm-200 transition-colors hover:bg-white"
+       style="border-color:#E8E4DC;">
+      <p class="section-label">LinkedIn</p>
+      <p class="text-base leading-relaxed transition-colors duration-200 group-hover:text-accent"
+         style="color:#1A1A18;font-weight:400;">
+        Felipe Villegas
+      </p>
+      <span class="mt-auto text-sm transition-colors duration-200 opacity-40 group-hover:opacity-100 group-hover:text-accent"
+            style="color:#C4622D;">↗</span>
     </a>
 
     <!-- THINK eLearn -->
     <a href="https://thinkelearn.com" target="_blank" rel="noopener"
-       class="group flex flex-col gap-2 p-6 border border-gray-200 rounded-xl hover:border-gray-400 hover:shadow-sm transition-all sm:col-span-2">
-      <span class="text-xs font-semibold uppercase tracking-widest text-gray-400">Learning &amp; Technology Consultancy</span>
-      <span class="text-base font-medium group-hover:text-gray-600 transition-colors">thinkelearn.com ↗</span>
-      <span class="text-sm text-gray-400">Instructional design, e-learning development, and learning strategy.</span>
+       class="group flex flex-col gap-4 p-8 border-b border-r border-warm-200 transition-colors hover:bg-white sm:col-span-2 lg:col-span-1"
+       style="border-color:#E8E4DC;">
+      <p class="section-label">THINK eLearn</p>
+      <p class="text-base leading-relaxed transition-colors duration-200 group-hover:text-accent"
+         style="color:#1A1A18;font-weight:400;">
+        thinkelearn.com
+      </p>
+      <p class="text-sm leading-relaxed" style="color:#8A8880;">
+        Instructional design, e-learning development, and learning strategy.
+      </p>
+      <span class="mt-auto text-sm transition-colors duration-200 opacity-40 group-hover:opacity-100 group-hover:text-accent"
+            style="color:#C4622D;">↗</span>
     </a>
 
   </div>
+
+  <div class="mt-20 pt-10 border-t border-warm-200" style="border-color:#E8E4DC;">
+    <p class="text-lg font-light leading-relaxed max-w-xl" style="color:#8A8880;font-weight:300;">
+      Whether you're building a learning experience, need a technical collaborator, or just want to connect.
+    </p>
+  </div>
+
 </div>
 {% endblock %}

@@ -4,53 +4,90 @@
 {% block title %}Work — Felipe Villegas{% endblock %}
 
 {% block content %}
-<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-  <h1 class="text-4xl font-bold tracking-tight mb-4">{{ page.title }}</h1>
-  <p class="text-gray-500 mb-10">A selection of projects across L&D, software, and hybrid work.</p>
+<div class="max-w-6xl mx-auto px-6 lg:px-10 py-16 sm:py-20">
 
-  <!-- Domain filter tabs -->
-  <div class="flex flex-wrap gap-2 mb-10">
+  <header class="mb-16 fade-up">
+    <p class="section-label mb-4">Selected Work</p>
+    <h1 style="font-family:'Playfair Display',Georgia,serif;font-size:clamp(2.5rem,6vw,4rem);line-height:1.1;font-weight:400;letter-spacing:-0.01em;color:#1A1A18;">
+      {{ page.title }}
+    </h1>
+  </header>
+
+  <!-- Domain filter -->
+  <div class="flex flex-wrap items-center gap-5 mb-14 border-t border-b border-warm-200 py-4" style="border-color:#E8E4DC;">
     <a href="{{ page.url }}"
-       class="px-4 py-1.5 rounded-full text-sm font-medium border transition-colors {% if not current_domain %}bg-gray-900 text-white border-gray-900{% else %}border-gray-200 text-gray-600 hover:border-gray-400{% endif %}">
+       style="font-size:0.6875rem;letter-spacing:0.14em;text-transform:uppercase;font-weight:500;transition:color 0.2s;
+              {% if not current_domain %}color:#1A1A18;{% else %}color:#B8B3A8;{% endif %}">
       All
     </a>
+    <span style="color:#D4CFC5;font-size:0.6875rem;">·</span>
     <a href="{{ page.url }}?domain=ld"
-       class="px-4 py-1.5 rounded-full text-sm font-medium border transition-colors {% if current_domain == 'ld' %}bg-gray-900 text-white border-gray-900{% else %}border-gray-200 text-gray-600 hover:border-gray-400{% endif %}">
+       style="font-size:0.6875rem;letter-spacing:0.14em;text-transform:uppercase;font-weight:500;transition:color 0.2s;
+              {% if current_domain == 'ld' %}color:#1A1A18;{% else %}color:#B8B3A8;{% endif %}">
       L&amp;D
     </a>
+    <span style="color:#D4CFC5;font-size:0.6875rem;">·</span>
     <a href="{{ page.url }}?domain=software"
-       class="px-4 py-1.5 rounded-full text-sm font-medium border transition-colors {% if current_domain == 'software' %}bg-gray-900 text-white border-gray-900{% else %}border-gray-200 text-gray-600 hover:border-gray-400{% endif %}">
+       style="font-size:0.6875rem;letter-spacing:0.14em;text-transform:uppercase;font-weight:500;transition:color 0.2s;
+              {% if current_domain == 'software' %}color:#1A1A18;{% else %}color:#B8B3A8;{% endif %}">
       Software
     </a>
+    <span style="color:#D4CFC5;font-size:0.6875rem;">·</span>
     <a href="{{ page.url }}?domain=hybrid"
-       class="px-4 py-1.5 rounded-full text-sm font-medium border transition-colors {% if current_domain == 'hybrid' %}bg-gray-900 text-white border-gray-900{% else %}border-gray-200 text-gray-600 hover:border-gray-400{% endif %}">
+       style="font-size:0.6875rem;letter-spacing:0.14em;text-transform:uppercase;font-weight:500;transition:color 0.2s;
+              {% if current_domain == 'hybrid' %}color:#1A1A18;{% else %}color:#B8B3A8;{% endif %}">
       Hybrid
     </a>
   </div>
 
   <!-- Project grid -->
   {% if projects %}
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
     {% for project in projects %}
-    <a href="{{ project.url }}" class="group block bg-white rounded-xl border border-gray-200 p-6 hover:border-gray-400 hover:shadow-sm transition-all">
-      <div class="flex items-center justify-between mb-3">
-        <span class="text-xs font-semibold uppercase tracking-widest text-gray-400">{{ project.get_primary_domain_display }}</span>
-        <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">{{ project.get_status_display }}</span>
+    <a href="{{ project.url }}" class="project-card group">
+
+      {% if project.hero_image %}
+      <div class="overflow-hidden bg-warm-100" style="aspect-ratio:16/10;">
+        {% image project.hero_image fill-720x450 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" %}
       </div>
-      <h2 class="text-lg font-semibold mb-2 group-hover:text-gray-600 transition-colors">{{ project.title }}</h2>
-      <p class="text-sm text-gray-500 mb-4 line-clamp-2">{{ project.tagline }}</p>
-      {% if project.tech_stack.all %}
-      <div class="flex flex-wrap gap-1.5">
-        {% for tag in project.tech_stack.all %}
-        <span class="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded">{{ tag.name }}</span>
-        {% endfor %}
+      {% else %}
+      <div class="flex items-center justify-center bg-warm-100" style="aspect-ratio:16/10;">
+        <span style="font-family:'Playfair Display',Georgia,serif;font-style:italic;font-size:3rem;color:#D4CFC5;">
+          {{ forloop.counter|stringformat:"02d" }}
+        </span>
       </div>
       {% endif %}
+
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-3">
+          <span class="tag-domain">{{ project.get_primary_domain_display }}</span>
+          <span class="tag-status">{{ project.get_status_display }}</span>
+        </div>
+        <h2 class="leading-snug mb-2 transition-colors duration-200 group-hover:text-accent"
+            style="font-family:'Playfair Display',Georgia,serif;font-size:1.25rem;font-weight:400;color:#1A1A18;">
+          {{ project.title }}
+        </h2>
+        <p class="text-sm leading-relaxed mb-4 line-clamp-2" style="color:#8A8880;">
+          {{ project.tagline }}
+        </p>
+        {% if project.tech_stack.all %}
+        <div class="flex flex-wrap gap-1.5 pt-4 border-t border-warm-100" style="border-color:#F5EFE6;">
+          {% for tag in project.tech_stack.all %}
+          <span class="tech-tag">{{ tag.name }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
     </a>
     {% endfor %}
   </div>
+
   {% else %}
-  <p class="text-gray-400 text-center py-16">No projects found in this category.</p>
+  <p style="font-family:'Playfair Display',Georgia,serif;font-style:italic;font-size:1.125rem;color:#B8B3A8;text-align:center;padding:5rem 0;">
+    No projects in this category.
+  </p>
   {% endif %}
+
 </div>
 {% endblock %}
