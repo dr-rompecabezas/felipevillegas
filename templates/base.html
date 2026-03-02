@@ -1,0 +1,74 @@
+{% load static wagtailcore_tags %}<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Felipe Villegas{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}Felipe Villegas — Learning & Development and Software Engineering{% endblock %}">
+  
+  <!-- Tailwind CSS -->
+  <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
+  
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" href="{% static 'images/favicon-96x96.png' %}" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}" />
+  <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}" sizes="32x32" />
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/apple-touch-icon.png' %}" />
+  <meta name="apple-mobile-web-app-title" content="F. Villegas" />
+  <link rel="manifest" href="{% static 'images/site.webmanifest' %}" />
+  
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="h-full bg-white text-gray-900 flex flex-col">
+
+  <!-- Navigation -->
+  <header class="border-b border-gray-100">
+    <nav class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+      <a href="/" class="text-lg font-semibold tracking-tight hover:text-gray-600 transition-colors">
+        Felipe Villegas
+      </a>
+      <ul class="flex items-center gap-6 text-sm font-medium">
+        <li>
+          <a href="/" class="hover:text-gray-600 transition-colors {% if request.path == '/' %}text-black{% else %}text-gray-500{% endif %}">
+            Home
+          </a>
+        </li>
+        <li>
+          <a href="/work/" class="hover:text-gray-600 transition-colors {% if '/work' in request.path %}text-black{% else %}text-gray-500{% endif %}">
+            Work
+          </a>
+        </li>
+        <li>
+          <a href="/photography/" class="hover:text-gray-600 transition-colors {% if '/photography' in request.path %}text-black{% else %}text-gray-500{% endif %}">
+            Photography
+          </a>
+        </li>
+        <li>
+          <a href="/contact/" class="hover:text-gray-600 transition-colors {% if '/contact' in request.path %}text-black{% else %}text-gray-500{% endif %}">
+            Contact
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Main content -->
+  <main class="flex-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-gray-100 py-8">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+      <p>&copy; {% now "Y" %} Felipe Villegas. All rights reserved.</p>
+      <ul class="flex items-center gap-4">
+        <li><a href="https://linkedin.com/in/felipevillegas" class="hover:text-gray-900 transition-colors" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://github.com/dr-rompecabezas" class="hover:text-gray-900 transition-colors" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="https://thinkelearn.com" class="hover:text-gray-900 transition-colors" target="_blank" rel="noopener">THINK eLearn</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

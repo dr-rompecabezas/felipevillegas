@@ -1,0 +1,12 @@
+{
+  "name": "felipevillegas",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -i ./static/css/input.css -o ./staticfiles/css/tailwind.css --minify",
+    "dev:css": "tailwindcss -i ./static/css/input.css -o ./static/css/tailwind.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^4.1.18"
+  }
+}

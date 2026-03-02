@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load wagtailimages_tags %}
+
+{% block title %}{{ page.title }} — Photography — Felipe Villegas{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+
+  <!-- Breadcrumb -->
+  <nav class="mb-8 text-sm text-gray-400">
+    <a href="/photography/" class="hover:text-gray-700 transition-colors">Photography</a>
+    <span class="mx-2">/</span>
+    <span class="text-gray-600">{{ page.title }}</span>
+  </nav>
+
+  <header class="mb-10">
+    <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">{{ page.get_category_display }}</p>
+    <h1 class="text-4xl font-bold tracking-tight mb-4">{{ page.title }}</h1>
+    {% if page.description %}
+    <p class="text-gray-500 max-w-2xl">{{ page.description }}</p>
+    {% endif %}
+  </header>
+
+  {% if page.images %}
+  <div class="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
+    {% for block in page.images %}
+      {% if block.block_type == "image" %}
+      <div class="break-inside-avoid">
+        {% image block.value width-800 class="w-full rounded-lg object-cover" %}
+      </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="text-gray-400 text-center py-16">No photos in this gallery yet.</p>
+  {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+[project]
+name = "felipevillegas"
+version = "0.1.0"
+description = "personal professional portfolio site for Felipe Villegas"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "dj-database-url>=3.1.2",
+    "django-htmx>=1.27.0",
+    "django-storages[s3]>=1.14.6",
+    "gunicorn>=25.1.0",
+    "psycopg[binary]>=3.3.3",
+    "python-decouple>=3.8",
+    "stripe>=14.4.0",
+    "wagtail>=7.3",
+    "whitenoise[brotli]>=6.12.0",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "coverage[toml]>=7.6",
+    "django-debug-toolbar>=6.1.0",
+]

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Contact — Felipe Villegas{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+  <h1 class="text-4xl font-bold tracking-tight mb-4">Get in touch</h1>
+  <p class="text-gray-500 mb-12 text-lg">Whether you're building a learning experience, need a technical collaborator, or just want to connect — I'd love to hear from you.</p>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+    <!-- Email -->
+    <a href="mailto:f.villegas@thinkelearn.com"
+       class="group flex flex-col gap-2 p-6 border border-gray-200 rounded-xl hover:border-gray-400 hover:shadow-sm transition-all">
+      <span class="text-xs font-semibold uppercase tracking-widest text-gray-400">Email</span>
+      <span class="text-base font-medium group-hover:text-gray-600 transition-colors">f.villegas@thinkelearn.com</span>
+    </a>
+
+    <!-- LinkedIn -->
+    <a href="https://linkedin.com/in/felipevillegas" target="_blank" rel="noopener"
+       class="group flex flex-col gap-2 p-6 border border-gray-200 rounded-xl hover:border-gray-400 hover:shadow-sm transition-all">
+      <span class="text-xs font-semibold uppercase tracking-widest text-gray-400">LinkedIn</span>
+      <span class="text-base font-medium group-hover:text-gray-600 transition-colors">linkedin.com/in/felipevillegas ↗</span>
+    </a>
+
+    <!-- THINK eLearn -->
+    <a href="https://thinkelearn.com" target="_blank" rel="noopener"
+       class="group flex flex-col gap-2 p-6 border border-gray-200 rounded-xl hover:border-gray-400 hover:shadow-sm transition-all sm:col-span-2">
+      <span class="text-xs font-semibold uppercase tracking-widest text-gray-400">Learning &amp; Technology Consultancy</span>
+      <span class="text-base font-medium group-hover:text-gray-600 transition-colors">thinkelearn.com ↗</span>
+      <span class="text-sm text-gray-400">Instructional design, e-learning development, and learning strategy.</span>
+    </a>
+
+  </div>
+</div>
+{% endblock %}

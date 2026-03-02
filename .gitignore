@@ -1,0 +1,22 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Django / project
+.env
+db.sqlite3
+staticfiles/
+media/
+static/css/tailwind.css
+node_modules/
+package-lock.json
+.DS_Store
+.coverage
+htmlcov/
