@@ -2,7 +2,7 @@
   "$schema": "https://railway.com/railway.schema.json",
   "build": {
     "builder": "RAILPACK",
-    "buildCommand": "npm install && npm run build:css && python manage.py collectstatic --noinput"
+    "buildCommand": "npm install && npm run build:css && DJANGO_SETTINGS_MODULE=config.settings.production python manage.py collectstatic --noinput"
   },
   "deploy": {
     "runtime": "V2",
