@@ -20,11 +20,11 @@
     <a href="{{ gallery.url }}" class="group block overflow-hidden bg-warm-100">
 
       {% if gallery.cover_image %}
-      <div class="overflow-hidden aspect-[4/3]">
+      <div class="overflow-hidden aspect-4/3">
         {% image gallery.cover_image fill-600x450 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" %}
       </div>
       {% else %}
-      <div class="flex items-center justify-center aspect-[4/3] bg-warm-200">
+      <div class="flex items-center justify-center aspect-4/3 bg-warm-200">
         <span class="font-display italic text-4xl text-warm-300">
           {{ forloop.counter|stringformat:"02d" }}
         </span>

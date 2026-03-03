@@ -11,7 +11,7 @@
 
       <p class="section-label fade-up mb-10">Portfolio</p>
 
-      <h1 class="fade-up-1 text-balance font-display font-normal text-ink leading-[1.06] tracking-[-0.01em] max-w-[900px]"
+      <h1 class="fade-up-1 text-balance font-display font-normal text-ink leading-[1.06] tracking-[-0.01em] max-w-225"
           style="font-size:clamp(2.75rem,8vw,5.5rem);">
         {{ block.value.heading }}
       </h1>
@@ -60,11 +60,11 @@
           <a href="{{ project.url }}" class="project-card group">
 
             {% if project.hero_image %}
-            <div class="overflow-hidden bg-warm-100 aspect-[16/10]">
+            <div class="overflow-hidden bg-warm-100 aspect-16/10">
               {% image project.hero_image fill-640x400 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" %}
             </div>
             {% else %}
-            <div class="flex items-center justify-center bg-warm-100 aspect-[16/10]">
+            <div class="flex items-center justify-center bg-warm-100 aspect-16/10">
               <span class="font-display italic text-4xl text-warm-300">
                 {{ forloop.counter|stringformat:"02d" }}
               </span>
