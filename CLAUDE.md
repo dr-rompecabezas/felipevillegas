@@ -24,6 +24,9 @@ uv run python manage.py check
 
 # First-time setup
 uv run python manage.py create_initial_pages   # builds page tree + sets Site root
+uv run python manage.py populate_home_page     # seeds HomePage StreamField content
+uv run python manage.py populate_projects      # seeds TechTags + all ProjectPages
+uv run python manage.py populate_seo           # sets seo_title/search_description on index pages
 uv run python manage.py createsuperuser
 ```
 
@@ -31,7 +34,7 @@ The `.env` file is loaded automatically via `python-decouple`. Minimum required 
 
 ## Architecture
 
-This is a **Wagtail CMS** site. Page content is managed entirely through the Wagtail admin at `/cms/`. There are no custom URL routes — page URLs are defined by the Wagtail page tree.
+This is a **Wagtail CMS** site. Page content is managed entirely through the Wagtail admin at `/admin/`. There are no custom URL routes — page URLs are defined by the Wagtail page tree.
 
 ### Settings split
 
@@ -39,7 +42,7 @@ This is a **Wagtail CMS** site. Page content is managed entirely through the Wag
 
 - `base.py` — shared config; all secrets read via `decouple.config()`
 - `dev.py` — SQLite fallback (no `DATABASE_URL` needed), debug toolbar enabled
-- `production.py` — S3 media via `django-storages`, WhiteNoise static files, security headers, Stripe keys
+- `production.py` — S3 media via `django-storages`, WhiteNoise static files, security headers, AWS keys
 
 `DJANGO_SETTINGS_MODULE` defaults to `config.settings.dev` in `manage.py` and `wsgi.py`.
 
@@ -69,7 +72,7 @@ wagtailcore.Page (root)
 
 ### Templates & CSS
 
-- Global shell: `templates/base.html` — includes Tailwind via CDN for development.
+- Global shell: `templates/base.html` — includes Tailwind via CDN for development. `<title>` and `<meta name="description">` are dynamic: use `page.seo_title`/`page.search_description` when set, fall back to `page.title | Felipe Villegas` and a static tagline.
 - App templates live in `<app>/templates/<app>/<model_snake>.html` (Wagtail convention).
 - For production, build CSS with: `npm run build` (Tailwind CLI, outputs to `staticfiles/css/output.css`).
 - `ImageChooserPanel` was removed in Wagtail 6+. Use `FieldPanel` for all image `ForeignKey` fields.
