@@ -554,7 +554,7 @@ class Command(BaseCommand):
 
         for data in PROJECTS:
             slug = data["slug"]
-            existing = ProjectPage.objects.filter(slug=slug).first()
+            existing = ProjectPage.objects.child_of(work_index).filter(slug=slug).first()
 
             if existing:
                 if force:
