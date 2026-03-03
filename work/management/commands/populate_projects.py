@@ -565,7 +565,7 @@ class Command(BaseCommand):
                     skipped_count += 1
                     continue
 
-            tech_slugs = data.pop("tech_slugs")
+            tech_slugs = data["tech_slugs"]
 
             page = ProjectPage(
                 title=data["title"],
@@ -583,11 +583,11 @@ class Command(BaseCommand):
                 search_description=data.get("search_description", ""),
                 outcome=data["outcome"],
                 body=data["body"],
-                live=True,
+                live=False,
             )
             work_index.add_child(instance=page)
             page.tech_stack.set([tags[s] for s in tech_slugs if s in tags])
-            page.save()
+            page.save_revision().publish()
 
             created_count += 1
             self.stdout.write(f"  Created ProjectPage: {page.title}")
