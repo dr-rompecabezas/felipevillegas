@@ -1,4 +1,5 @@
-{% load static wagtailcore_tags %}<!DOCTYPE html>
+{% load static wagtailcore_tags wagtailuserbar %}
+<!DOCTYPE html>
 <html lang="en" class="h-full">
 <head>
   <meta charset="UTF-8">
@@ -86,5 +87,6 @@
   </footer>
 
   {% block extra_js %}{% endblock %}
+  {% wagtailuserbar %}
 </body>
 </html>
