@@ -83,7 +83,5 @@ class HomePage(Page):
         context = super().get_context(request, *args, **kwargs)
         from work.models import ProjectPage
 
-        context["featured_projects"] = ProjectPage.objects.filter(featured=True, live=True).order_by(
-            "-first_published_at"
-        )[:6]
+        context["featured_projects"] = ProjectPage.objects.filter(featured=True, live=True)[:6]
         return context

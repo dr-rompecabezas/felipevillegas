@@ -10,7 +10,7 @@ class PhotographyIndexPage(Page):
 
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)
-        context["galleries"] = GalleryPage.objects.child_of(self).live().order_by("-first_published_at")
+        context["galleries"] = GalleryPage.objects.child_of(self).live()
         return context
 
 
