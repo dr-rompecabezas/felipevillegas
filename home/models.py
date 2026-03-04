@@ -83,5 +83,5 @@ class HomePage(Page):
         context = super().get_context(request, *args, **kwargs)
         from work.models import ProjectPage
 
-        context["featured_projects"] = ProjectPage.objects.filter(featured=True, live=True)[:6]
+        context["featured_projects"] = ProjectPage.objects.live().filter(featured=True).select_related("hero_image")[:6]
         return context
