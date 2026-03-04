@@ -65,6 +65,11 @@ See `.env.example` for the full list. Production-only variables (S3) can be left
 | `AWS_*` | Production | S3 media storage |
 | `WAGTAILADMIN_BASE_URL` | Production | Used in Wagtail email links |
 
+For media-performance tuning in production:
+
+- `AWS_S3_CACHE_CONTROL` defaults to `public, max-age=31536000, immutable` for uploaded media objects.
+- Set `AWS_QUERYSTRING_AUTH=False` only when media objects are publicly readable (for example via public bucket policy or CloudFront) so image URLs are stable and cacheable.
+
 ## Deployment
 
 Deployed on Railway. Push to `main` triggers an auto-deploy:

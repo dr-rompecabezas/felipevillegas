@@ -29,7 +29,7 @@ class WorkIndexPage(Page):
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)
         domain = request.GET.get("domain", "")
-        projects = ProjectPage.objects.child_of(self).live().prefetch_related("tech_stack")
+        projects = ProjectPage.objects.child_of(self).live().select_related("hero_image").prefetch_related("tech_stack")
         if domain in ("ld", "software", "hybrid"):
             projects = projects.filter(primary_domain=domain)
         context["projects"] = projects

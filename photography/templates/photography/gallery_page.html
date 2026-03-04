@@ -37,7 +37,11 @@
     {% for item in page.images %}
       {% if item.block_type == "image" %}
       <div class="break-inside-avoid overflow-hidden">
-        {% image item.value width-800 class="w-full object-cover hover:opacity-95 transition-opacity duration-300" %}
+        {% if forloop.first %}
+          {% picture item.value format-{avif,webp} width-800 class="w-full object-cover hover:opacity-95 transition-opacity duration-300" fetchpriority="high" %}
+        {% else %}
+          {% picture item.value format-{avif,webp} width-800 class="w-full object-cover hover:opacity-95 transition-opacity duration-300" loading="lazy" %}
+        {% endif %}
       </div>
       {% endif %}
     {% endfor %}

@@ -44,11 +44,15 @@
     <a href="{{ project.url }}" class="project-card group">
 
       {% if project.hero_image %}
-      <div class="overflow-hidden bg-warm-100 aspect-[16/10]">
-        {% image project.hero_image fill-720x450 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" %}
+      <div class="overflow-hidden bg-warm-100 aspect-16/10">
+        {% if forloop.first %}
+          {% picture project.hero_image format-{avif,webp} fill-720x450 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" fetchpriority="high" %}
+        {% else %}
+          {% picture project.hero_image format-{avif,webp} fill-720x450 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" loading="lazy" %}
+        {% endif %}
       </div>
       {% else %}
-      <div class="flex items-center justify-center bg-warm-100 aspect-[16/10]">
+      <div class="flex items-center justify-center bg-warm-100 aspect-16/10">
         <span class="font-display italic text-5xl text-warm-300">
           {{ forloop.counter|stringformat:"02d" }}
         </span>
