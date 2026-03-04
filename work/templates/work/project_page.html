@@ -90,7 +90,7 @@
   {% if page.hero_image %}
   <div class="max-w-6xl mx-auto px-6 lg:px-10 mt-12">
     <div class="overflow-hidden max-h-130">
-      {% image page.hero_image width-1400 class="w-full object-cover" %}
+      {% picture page.hero_image format-{avif,webp} width-1400 class="w-full object-cover" fetchpriority="high" %}
     </div>
   </div>
   {% endif %}
@@ -105,7 +105,7 @@
           {{ item.value }}
         {% elif item.block_type == "image" %}
         <figure class="my-10 -mx-6 lg:mx-0">
-          {% image item.value width-900 class="w-full" %}
+          {% picture item.value format-{avif,webp} width-900 class="w-full" loading="lazy" %}
         </figure>
         {% endif %}
       {% endfor %}

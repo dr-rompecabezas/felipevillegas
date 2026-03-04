@@ -61,7 +61,11 @@
 
             {% if project.hero_image %}
             <div class="overflow-hidden bg-warm-100 aspect-16/10">
-              {% image project.hero_image fill-640x400 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" %}
+              {% if forloop.first %}
+                {% picture project.hero_image format-{avif,webp} fill-640x400 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" fetchpriority="high"%}
+              {% else %}
+                {% picture project.hero_image format-{avif,webp} fill-640x400 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" loading="lazy"%}
+              {% endif %}
             </div>
             {% else %}
             <div class="flex items-center justify-center bg-warm-100 aspect-16/10">
