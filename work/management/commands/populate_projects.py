@@ -45,6 +45,7 @@ TAG_SLUGS = [
     ("ClassMarker", "classmarker"),
     ("ProctorU", "proctoru"),
     ("Heroku", "heroku"),
+    ("Zendesk", "zendesk"),
 ]
 
 
@@ -68,7 +69,7 @@ PROJECTS = [
         "featured": True,
         "link_github": "https://github.com/dr-rompecabezas/wagtail-lms",
         "link_pypi": "https://pypi.org/project/wagtail-lms/",
-        "link_live": "",
+        "link_live": "https://wagtail-lms.readthedocs.io/en/stable/",
         "tech_slugs": ["wagtail", "django", "python", "scorm", "xapi", "h5p"],
         "seo_title": "wagtail-lms — Open Source Django LMS Package",
         "search_description": (
@@ -443,7 +444,7 @@ PROJECTS = [
         "link_github": "",
         "link_live": "",
         "link_pypi": "",
-        "tech_slugs": ["moodle", "aws"],
+        "tech_slugs": ["moodle", "aws", "zendesk"],
         "seo_title": "College of Physiotherapists LMS — Enterprise Moodle on AWS",
         "search_description": (
             "Enterprise Moodle on AWS for 9,000 regulated physiotherapists. "

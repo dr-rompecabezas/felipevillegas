@@ -75,7 +75,7 @@ For media-performance tuning in production:
 Deployed on Railway. Push to `main` triggers an auto-deploy:
 
 1. `python manage.py migrate` (release command)
-2. `gunicorn felipevillegas.wsgi` (start command)
+2. `gunicorn config.wsgi` (start command)
 
 Static files are served by WhiteNoise. Media files are stored in S3.
 
