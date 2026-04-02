@@ -257,7 +257,7 @@ PROJECTS = [
         "primary_domain": "hybrid",
         "featured": False,
         "link_github": "",
-        "link_live": "",
+        "link_live": "https://cfas-demo.up.railway.app/",
         "link_pypi": "",
         "tech_slugs": [
             "django",
@@ -297,6 +297,63 @@ PROJECTS = [
                     "<p>The project is archived — the RFP process concluded — but it "
                     "remains a useful reference for how quickly a complex, multi-capability "
                     "Django application can be stood up when the stack is well understood.</p>"
+                ),
+            ]
+        ),
+    },
+    {
+        "title": "CTCMPAO Learning Hub MVP",
+        "slug": "ctcmpao-learning-hub-mvp",
+        "tagline": "Knowledge pipeline and Wagtail learning hub prototype for a regulated health college — crawl, extract, triage, publish.",
+        "role": "Lead Developer",
+        "client_context": "College of Traditional Chinese Medicine Practitioners and Acupuncturists of Ontario — RFP for a practitioner learning hub",
+        "status": "archived",
+        "primary_domain": "hybrid",
+        "featured": False,
+        "link_github": "",
+        "link_live": "https://ctcmpao-hub-demo.up.railway.app/",
+        "link_pypi": "",
+        "tech_slugs": [
+            "django",
+            "wagtail",
+            "python",
+            "postgresql",
+        ],
+        "seo_title": "CTCMPAO Learning Hub MVP — Django Knowledge Pipeline",
+        "search_description": (
+            "Django + Wagtail prototype built for a competitive RFP. "
+            "Automated knowledge pipeline crawls, extracts, and triages regulatory "
+            "content into a searchable practitioner learning hub."
+        ),
+        "outcome": (
+            "Competitive RFP prototype with a three-layer knowledge pipeline: "
+            "automated crawling and PDF extraction of regulatory content, "
+            "triage workflow for quality control, and a Wagtail learning hub "
+            "surfacing Standards of Practice, discipline decisions, and "
+            "professional development material."
+        ),
+        "body": json.dumps(
+            [
+                _rt(
+                    "<p>The College of Traditional Chinese Medicine Practitioners and "
+                    "Acupuncturists of Ontario needed a learning hub to help its members "
+                    "navigate regulatory standards and professional development requirements. "
+                    "I built a working prototype to demonstrate how the college's existing "
+                    "web content could be automatically ingested, structured, and served "
+                    "through a modern learning platform.</p>"
+                    "<p>The core of the project is a three-layer knowledge pipeline. The "
+                    "inventory layer crawls ctcmpao.on.ca and extracts content from web "
+                    "pages and PDFs using Beautiful Soup, lxml, and pdfplumber. The "
+                    "knowledge layer normalises, tags, and triages extracted material into "
+                    "canonical database records — Standards of Practice, discipline "
+                    "decisions, practice guidelines — with heading-based chunking for "
+                    "precise retrieval. The hub layer syncs canonical knowledge into "
+                    "Wagtail pages with full-text search and a practitioner-facing "
+                    "browsing experience.</p>"
+                    "<p>The project is archived — the RFP process concluded — but it "
+                    "demonstrates how a content-heavy regulatory site can be transformed "
+                    "into a structured, searchable knowledge base with a single "
+                    "orchestration command.</p>"
                 ),
             ]
         ),
