@@ -160,6 +160,7 @@ TRANSLATION_ROWS = [
             "queryset is scoped automatically. The same pattern lets a single LMS "
             "host many client orgs without duplicate databases or special-case code.</p>"
         ),
+        "audience_tags": ["lms_architect", "learning_engineer"],
     },
     {
         "qlubpro_feature": "Personalised player dashboard (matches, standings, challenges)",
@@ -169,6 +170,7 @@ TRANSLATION_ROWS = [
             "<em>right now</em>. It's the same design discipline a good learner home "
             "page needs: not a list of everything, but a short list of what to do next.</p>"
         ),
+        "audience_tags": ["program_designer", "technical_id"],
     },
     {
         "qlubpro_feature": "Role-based access (admin / captain / player)",
@@ -178,6 +180,7 @@ TRANSLATION_ROWS = [
             "not just the template. That's how an LMS keeps a senior leader's path "
             "clean of new-hire onboarding while still letting them drop in if needed.</p>"
         ),
+        "audience_tags": ["program_designer", "lms_architect"],
     },
     {
         "qlubpro_feature": "Enrollment windows, waitlists, and approval flows",
@@ -187,6 +190,7 @@ TRANSLATION_ROWS = [
             "enrolled → completed, with the right notification at every transition. "
             "Same shape, different domain.</p>"
         ),
+        "audience_tags": ["program_designer", "lms_architect"],
     },
     {
         "qlubpro_feature": "Rotating match schedule generation",
@@ -196,6 +200,7 @@ TRANSLATION_ROWS = [
             "The hard part isn't the algorithm — it's the override and exception "
             "handling that lets a human intervene without breaking the model.</p>"
         ),
+        "audience_tags": ["learning_engineer", "technical_id"],
     },
     {
         "qlubpro_feature": "Score entry, dispute, and confirmation flows",
@@ -205,6 +210,7 @@ TRANSLATION_ROWS = [
             "the structure of a feedback loop that respects the learner. The dispute "
             "path is what separates a real assessment system from a quiz.</p>"
         ),
+        "audience_tags": ["technical_id", "program_designer"],
     },
     {
         "qlubpro_feature": "Notification and nudge workflows",
@@ -214,6 +220,7 @@ TRANSLATION_ROWS = [
             "respect. The hardest part is restraint: every nudge that doesn't add "
             "value erodes the channel for the ones that do.</p>"
         ),
+        "audience_tags": ["learning_engineer", "lms_architect"],
     },
     {
         "qlubpro_feature": "Season planner with standings and movement indicators",
@@ -223,6 +230,7 @@ TRANSLATION_ROWS = [
             "they stand and where they're headed; so should a learner. The data model "
             "is nearly identical.</p>"
         ),
+        "audience_tags": ["program_designer", "technical_id"],
     },
 ]
 

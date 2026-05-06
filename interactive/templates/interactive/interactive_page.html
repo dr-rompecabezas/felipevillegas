@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load wagtailcore_tags wagtailimages_tags %}
+{% load static wagtailcore_tags wagtailimages_tags %}
 
 {% block title %}{% if page.seo_title %}{{ page.seo_title }} | Felipe Villegas{% else %}Interactive — Felipe Villegas{% endif %}{% endblock %}
 
@@ -62,6 +62,27 @@
     max-width: 36rem;
   }
 
+  /* Role kicker (shown only when ?role= resolves to a known archetype) */
+  .interactive-page .role-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.75rem;
+    border: 1px solid var(--page-accent);
+    color: var(--page-accent);
+    font-size: 0.625rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+  .interactive-page .role-kicker .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--page-accent);
+  }
+
   /* Timeline */
   .interactive-page .timeline {
     position: relative;
@@ -83,6 +104,7 @@
     padding-left: 2.5rem;
     padding-top: 0.5rem;
     padding-bottom: 3rem;
+    transition: opacity 0.4s ease;
   }
   .interactive-page .timeline-node::before {
     content: "";
@@ -112,14 +134,70 @@
     margin-bottom: 0.75rem;
     text-transform: none;
   }
+  .interactive-page .timeline-node .toggle {
+    background: transparent;
+    border: 0;
+    padding: 0;
+    text-align: left;
+    width: 100%;
+    cursor: pointer;
+    color: inherit;
+    font: inherit;
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+  }
+  .interactive-page .timeline-node .toggle:focus-visible {
+    outline: 2px solid var(--page-accent);
+    outline-offset: 4px;
+  }
+  .interactive-page .timeline-node .chev {
+    flex: 0 0 auto;
+    width: 0.75rem;
+    height: 0.75rem;
+    margin-left: auto;
+    color: #8A8880;
+    transition: transform 0.2s ease;
+    align-self: center;
+  }
+  .interactive-page .timeline-node .toggle[aria-expanded="true"] .chev {
+    transform: rotate(90deg);
+  }
+  .interactive-page .timeline-node .body {
+    overflow: hidden;
+  }
+  /* Audience emphasis: when a non-generic explicit role is selected, dim
+     non-matching nodes. Glow on matched nodes derives from --page-accent so
+     the colour stays consistent with the configured page accent. */
+  .interactive-page[data-emphasis-active="true"] .timeline-node:not(.is-match) {
+    opacity: 0.45;
+  }
+  .interactive-page[data-emphasis-active="true"] .timeline-node.is-match::before {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--page-accent) 12%, transparent);
+  }
 
   /* Translation rows */
   .interactive-page .translation-row {
     border-top: 1px solid #E8E4DC;
     padding: 1.75rem 0;
+    transition: opacity 0.4s ease, background-color 0.3s ease;
   }
   .interactive-page .translation-row:last-child {
     border-bottom: 1px solid #E8E4DC;
+  }
+  .interactive-page .translation-toggle {
+    background: transparent;
+    border: 0;
+    padding: 0;
+    text-align: left;
+    width: 100%;
+    cursor: pointer;
+    color: inherit;
+    font: inherit;
+  }
+  .interactive-page .translation-toggle:focus-visible {
+    outline: 2px solid var(--page-accent);
+    outline-offset: 4px;
   }
   .interactive-page .translation-pair {
     display: grid;
@@ -129,13 +207,17 @@
   }
   @media (min-width: 768px) {
     .interactive-page .translation-pair {
-      grid-template-columns: 1fr auto 1fr;
+      grid-template-columns: 1fr auto 1fr auto;
     }
   }
   .interactive-page .translation-pair .qlubpro-side {
     font-family: 'DM Sans', system-ui, sans-serif;
     font-size: 1rem;
     color: #5C5A54;
+    transition: color 0.3s ease;
+  }
+  .interactive-page .translation-row .translation-toggle[aria-expanded="true"] .qlubpro-side {
+    color: #8A8880;
   }
   .interactive-page .translation-pair .arrow {
     color: var(--page-accent);
@@ -143,6 +225,10 @@
     font-size: 1rem;
     text-align: center;
     user-select: none;
+    transition: transform 0.3s ease;
+  }
+  .interactive-page .translation-row .translation-toggle[aria-expanded="true"] .arrow {
+    transform: translateX(2px);
   }
   @media (max-width: 767px) {
     .interactive-page .translation-pair .arrow {
@@ -158,10 +244,24 @@
     font-style: italic;
     font-size: 1.125rem;
     color: #1A1A18;
+    transition: color 0.3s ease;
+  }
+  .interactive-page .translation-row .translation-toggle[aria-expanded="true"] .learning-side {
+    color: var(--page-accent);
+  }
+  .interactive-page .translation-pair .row-chev {
+    color: #8A8880;
+    font-size: 0.75rem;
+    align-self: center;
+    transition: transform 0.2s ease;
+  }
+  .interactive-page .translation-row .translation-toggle[aria-expanded="true"] .row-chev {
+    transform: rotate(90deg);
   }
   .interactive-page .translation-row .commentary {
     margin-top: 1rem;
     max-width: 44rem;
+    overflow: hidden;
   }
   .interactive-page .translation-row .commentary p {
     font-size: 0.9375rem;
@@ -172,6 +272,9 @@
     margin-top: 1rem;
     max-width: 32rem;
     border: 1px solid #E8E4DC;
+  }
+  .interactive-page[data-emphasis-active="true"] .translation-row:not(.is-match) {
+    opacity: 0.55;
   }
 
   /* AI cards */
@@ -242,12 +345,97 @@
     flex-wrap: wrap;
     gap: 0.5rem;
   }
-  .interactive-page .reflection .options li {
+  .interactive-page .reflection .option-btn {
     background: white;
     border: 1px solid #D4CFC5;
     padding: 0.5rem 0.875rem;
     font-size: 0.875rem;
     color: #3A3835;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+  .interactive-page .reflection .option-btn:hover {
+    border-color: var(--page-accent);
+    color: var(--page-accent);
+  }
+  .interactive-page .reflection .option-btn:focus-visible {
+    outline: 2px solid var(--page-accent);
+    outline-offset: 2px;
+  }
+  .interactive-page .reflection .option-btn[aria-pressed="true"] {
+    background-color: var(--page-accent);
+    border-color: var(--page-accent);
+    color: #FAF7F2;
+  }
+  /* Reflection echo card — appears below buttons when an option is picked */
+  .interactive-page .reflection .echo-stack {
+    margin-top: 1.75rem;
+  }
+  .interactive-page .reflection .echo {
+    background: white;
+    border: 1px solid #E8E4DC;
+    border-left: 2px solid var(--page-accent);
+    padding: 1.5rem 1.75rem;
+    max-width: 44rem;
+  }
+  .interactive-page .reflection .echo-pair {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.375rem 1rem;
+    align-items: baseline;
+    margin-bottom: 1rem;
+  }
+  @media (min-width: 640px) {
+    .interactive-page .reflection .echo-pair {
+      grid-template-columns: 1fr auto 1fr;
+    }
+  }
+  .interactive-page .reflection .echo-q {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 0.9375rem;
+    color: #5C5A54;
+  }
+  .interactive-page .reflection .echo-arrow {
+    color: var(--page-accent);
+    text-align: center;
+    user-select: none;
+  }
+  @media (max-width: 639px) {
+    .interactive-page .reflection .echo-arrow {
+      text-align: left;
+      font-size: 0.6875rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #8A8880;
+    }
+  }
+  .interactive-page .reflection .echo-l {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-style: italic;
+    font-size: 1.0625rem;
+    color: #1A1A18;
+  }
+  .interactive-page .reflection .echo-commentary p {
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: #3A3835;
+    margin-bottom: 0.5em;
+  }
+  .interactive-page .reflection .echo-jump {
+    margin-top: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    color: var(--page-accent);
+    font-size: 0.625rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .interactive-page .reflection .echo-jump:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
 
   /* Chat placeholder */
@@ -277,15 +465,75 @@
     font-size: 1.0625rem;
     line-height: 1.75;
   }
+
+  /* Scroll progress affordance — column of dots on the right edge */
+  .scroll-progress {
+    position: fixed;
+    top: 50%;
+    right: 1.25rem;
+    transform: translateY(-50%);
+    display: none;
+    flex-direction: column;
+    gap: 0.625rem;
+    z-index: 40;
+  }
+  @media (min-width: 1024px) {
+    .scroll-progress { display: flex; }
+  }
+  .scroll-progress .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: transparent;
+    border: 1px solid #B8B4A8;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    display: block;
+  }
+  .scroll-progress .dot:hover {
+    border-color: var(--page-accent, #1A3A5C);
+  }
+  .scroll-progress .dot:focus-visible {
+    outline: 2px solid var(--page-accent, #1A3A5C);
+    outline-offset: 2px;
+  }
+  .scroll-progress .dot.is-active {
+    background-color: var(--page-accent, #1A3A5C);
+    border-color: var(--page-accent, #1A3A5C);
+    transform: scale(1.25);
+  }
+
+  /* Alpine cloak — prevent x-show flash before init */
+  [x-cloak] { display: none !important; }
 </style>
 {% endblock %}
 
 {% block content %}
-<article class="interactive-page bg-surface text-ink">
+<article class="interactive-page bg-surface text-ink"
+         x-data="interactivePage()"
+         data-audience-focus="{{ audience_focus }}"
+         data-emphasis-active="{% if audience_emphasis_active %}true{% else %}false{% endif %}">
+
+  {# Scroll progress — six dots, one per major section ----------------------- #}
+  <aside class="scroll-progress" aria-label="Section navigation">
+    <a href="#section-hero" class="dot" :class="{ 'is-active': activeSection === 'hero' }" @click.prevent="jumpTo('section-hero')" title="Hero"><span class="sr-only">Hero</span></a>
+    <a href="#section-timeline" class="dot" :class="{ 'is-active': activeSection === 'timeline' }" @click.prevent="jumpTo('section-timeline')" title="Timeline"><span class="sr-only">Timeline</span></a>
+    <a href="#section-translation" class="dot" :class="{ 'is-active': activeSection === 'translation' }" @click.prevent="jumpTo('section-translation')" title="Translation"><span class="sr-only">Translation</span></a>
+    <a href="#section-ai" class="dot" :class="{ 'is-active': activeSection === 'ai' }" @click.prevent="jumpTo('section-ai')" title="AI"><span class="sr-only">AI</span></a>
+    {% if page.reflection|length %}
+    <a href="#section-reflection" class="dot" :class="{ 'is-active': activeSection === 'reflection' }" @click.prevent="jumpTo('section-reflection')" title="Reflection"><span class="sr-only">Reflection</span></a>
+    {% endif %}
+    <a href="#section-closing" class="dot" :class="{ 'is-active': activeSection === 'closing' }" @click.prevent="jumpTo('section-closing')" title="Closing"><span class="sr-only">Closing</span></a>
+  </aside>
 
   {# 1 — Hero ----------------------------------------------------------------- #}
-  <section class="hero" aria-labelledby="hero-statement">
+  <section id="section-hero" class="hero" aria-labelledby="hero-statement" data-section-id="hero">
     <div class="section-frame w-full">
+      {% if audience_emphasis_active and audience_focus_display %}
+        <p class="role-kicker fade-up">
+          <span class="dot" aria-hidden="true"></span>
+          For {{ audience_focus_display }}
+        </p>
+      {% endif %}
       {% if page.hero_kicker %}
         <p class="section-label mb-6 fade-up">{{ page.hero_kicker }}</p>
       {% endif %}
@@ -300,7 +548,7 @@
   </section>
 
   {# 2 — Timeline ------------------------------------------------------------- #}
-  <section class="py-24 sm:py-32" aria-labelledby="timeline-heading">
+  <section id="section-timeline" class="py-24 sm:py-32" aria-labelledby="timeline-heading" data-section-id="timeline">
     <div class="section-frame">
       <header class="mb-14 fade-up">
         <p class="section-label mb-4">Module One</p>
@@ -315,12 +563,25 @@
       </header>
 
       <ol class="timeline">
-        {% for block in page.timeline_nodes %}
-          <li class="timeline-node fade-up"
+        {% for block in timeline_nodes_ordered %}
+          <li class="timeline-node fade-up{% if audience_emphasis_active and audience_focus in block.value.audience_tags %} is-match{% endif %}"
+              x-data="{ open: false }"
               data-audience-tags="{% for tag in block.value.audience_tags %}{{ tag }}{% if not forloop.last %} {% endif %}{% endfor %}">
-            <span class="year">{{ block.value.year }}</span>
-            <h3 class="label">{{ block.value.label }}</h3>
-            <div class="editorial-body">{{ block.value.body|richtext }}</div>
+            <button type="button" class="toggle" @click="open = !open" :aria-expanded="open">
+              <span>
+                <span class="year">{{ block.value.year }}</span>
+                <span class="label block">{{ block.value.label }}</span>
+              </span>
+              <svg class="chev" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                <path d="M4 2.5l3.5 3.5L4 9.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div class="body editorial-body mt-3"
+                 x-show="open"
+                 x-cloak
+                 x-transition.opacity.duration.200ms>
+              {{ block.value.body|richtext }}
+            </div>
           </li>
         {% endfor %}
       </ol>
@@ -328,7 +589,7 @@
   </section>
 
   {# 3 — QlubPro → Learning translation -------------------------------------- #}
-  <section class="py-24 sm:py-32 bg-warm-50" aria-labelledby="translation-heading">
+  <section id="section-translation" class="py-24 sm:py-32 bg-warm-50" aria-labelledby="translation-heading" data-section-id="translation">
     <div class="section-frame">
       <header class="mb-12 fade-up">
         <p class="section-label mb-4">Module Two</p>
@@ -346,18 +607,26 @@
       </header>
 
       <ol class="list-none p-0 m-0">
-        {% for block in page.translation_rows %}
-          <li class="translation-row">
-            <div class="translation-pair">
-              <div class="qlubpro-side">{{ block.value.qlubpro_feature }}</div>
-              <div class="arrow" aria-hidden="true">→</div>
-              <div class="learning-side">{{ block.value.learning_equivalent }}</div>
-            </div>
+        {% for block in translation_rows_ordered %}
+          <li class="translation-row{% if audience_emphasis_active and audience_focus in block.value.audience_tags %} is-match{% endif %}"
+              x-data="{ open: false }">
+            <button type="button" class="translation-toggle" @click="open = !open" :aria-expanded="open">
+              <div class="translation-pair">
+                <span class="qlubpro-side">{{ block.value.qlubpro_feature }}</span>
+                <span class="arrow" aria-hidden="true">→</span>
+                <span class="learning-side">{{ block.value.learning_equivalent }}</span>
+                <svg class="row-chev hidden md:block" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                  <path d="M4 2.5l3.5 3.5L4 9.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </button>
             {% if block.value.commentary %}
-              <div class="commentary editorial-body">{{ block.value.commentary|richtext }}</div>
+              <div class="commentary editorial-body" x-show="open" x-cloak x-transition.opacity.duration.200ms>
+                {{ block.value.commentary|richtext }}
+              </div>
             {% endif %}
             {% if block.value.screenshot %}
-              <div class="screenshot">
+              <div class="screenshot" x-show="open" x-cloak x-transition.opacity.duration.200ms>
                 {% image block.value.screenshot fill-1024x576 format-webp class="block w-full h-auto" %}
               </div>
             {% endif %}
@@ -368,7 +637,7 @@
   </section>
 
   {# 4 — AI in practice ------------------------------------------------------ #}
-  <section class="py-24 sm:py-32" aria-labelledby="ai-heading">
+  <section id="section-ai" class="py-24 sm:py-32" aria-labelledby="ai-heading" data-section-id="ai">
     <div class="section-frame">
       <header class="mb-12 fade-up">
         <p class="section-label mb-4">Module Three</p>
@@ -400,16 +669,45 @@
 
   {# 5 — Reflection (interactive ID beat) ------------------------------------ #}
   {% for block in page.reflection %}
-    <section class="py-20" aria-labelledby="reflection-prompt">
+    <section id="section-reflection" class="py-20" aria-labelledby="reflection-prompt" data-section-id="reflection">
       <div class="section-frame">
         <div class="reflection fade-up">
           <p class="section-label mb-4">A pause</p>
           <p id="reflection-prompt" class="prompt">{{ block.value.prompt }}</p>
           <ul class="options" role="list">
             {% for option in block.value.options %}
-              <li>{{ option }}</li>
+              <li>
+                <button type="button"
+                        class="option-btn"
+                        :aria-pressed="reflectionChoice === '{{ option|escapejs }}'"
+                        @click="pickReflection('{{ option|escapejs }}')">
+                  {{ option }}
+                </button>
+              </li>
             {% endfor %}
           </ul>
+          <div class="echo-stack" aria-live="polite">
+            {% for opt in reflection_option_echoes %}
+              <article class="echo"
+                       x-show="reflectionChoice === '{{ opt.option|escapejs }}'"
+                       x-cloak
+                       x-transition.opacity.duration.250ms>
+                <div class="echo-pair">
+                  <span class="echo-q">{{ opt.qlubpro_feature }}</span>
+                  <span class="echo-arrow" aria-hidden="true">→</span>
+                  <span class="echo-l">{{ opt.learning_equivalent }}</span>
+                </div>
+                {% if opt.commentary %}
+                  <div class="echo-commentary editorial-body">{{ opt.commentary|richtext }}</div>
+                {% endif %}
+                <a class="echo-jump" href="#section-translation"
+                   @click.prevent="jumpTo('section-translation')">
+                  See in Module Two
+                  <span aria-hidden="true">↑</span>
+                </a>
+              </article>
+            {% endfor %}
+          </div>
         </div>
       </div>
     </section>
@@ -441,7 +739,7 @@
   {% endif %}
 
   {# 7 — Closing ------------------------------------------------------------- #}
-  <section class="py-24 sm:py-32 border-t border-warm-200" aria-labelledby="closing-heading">
+  <section id="section-closing" class="py-24 sm:py-32 border-t border-warm-200" aria-labelledby="closing-heading" data-section-id="closing">
     <div class="section-frame">
       <div class="closing fade-up">
         <p class="section-label mb-6">In closing</p>
@@ -461,4 +759,50 @@
   </section>
 
 </article>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function interactivePage() {
+    return {
+      reflectionChoice: null,
+      activeSection: null,
+      init() {
+        try {
+          this.reflectionChoice = localStorage.getItem('interactive:reflection') || null;
+        } catch (_) { /* private mode / disabled storage */ }
+        this._observeSections();
+      },
+      pickReflection(option) {
+        // Toggle off when re-clicking the same option.
+        if (this.reflectionChoice === option) {
+          this.reflectionChoice = null;
+          try { localStorage.removeItem('interactive:reflection'); } catch (_) {}
+          return;
+        }
+        this.reflectionChoice = option;
+        try { localStorage.setItem('interactive:reflection', option); } catch (_) {}
+      },
+      jumpTo(id) {
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      },
+      _observeSections() {
+        const sections = document.querySelectorAll('[data-section-id]');
+        if (!('IntersectionObserver' in window) || sections.length === 0) return;
+        const obs = new IntersectionObserver((entries) => {
+          // Pick the first intersecting section near the viewport's centre band.
+          const visible = entries
+            .filter(e => e.isIntersecting)
+            .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+          if (visible.length) {
+            this.activeSection = visible[0].target.dataset.sectionId;
+          }
+        }, { rootMargin: '-40% 0px -40% 0px', threshold: [0, 0.25, 0.5, 1] });
+        sections.forEach(s => obs.observe(s));
+      },
+    };
+  }
+</script>
+<script defer src="{% static 'js/alpine.min.js' %}"></script>
 {% endblock %}
