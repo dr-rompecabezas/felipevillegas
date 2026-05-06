@@ -22,6 +22,41 @@ AUDIENCE_FOCUS_CHOICES = [
     ("technical_id", "Technical Instructional Designer"),
 ]
 
+AUDIENCE_FOCUS_VALUES = {value for value, _ in AUDIENCE_FOCUS_CHOICES}
+
+
+def audience_focus_to_url(value: str) -> str:
+    """Internal value (program_designer) → URL slug (program-designer)."""
+    return value.replace("_", "-")
+
+
+def audience_focus_from_url(slug: str) -> str | None:
+    """URL slug → internal value, or None if unknown.
+
+    Accepts dashed (program-designer) and underscored (program_designer) forms,
+    case-insensitive. Returns None when the slug is empty or doesn't map to a
+    known audience focus.
+    """
+    if not slug:
+        return None
+    candidate = slug.strip().lower().replace("-", "_")
+    return candidate if candidate in AUDIENCE_FOCUS_VALUES else None
+
+
+# Reflection options are framed in reader-conversational language; translation
+# rows are framed in domain-specific language. This mapping is the deliberate
+# editorial pairing between the two — option text → translation row's
+# `qlubpro_feature` (the row's stable identity within the StreamField).
+# Edit here to re-pair an option with a different row.
+REFLECTION_OPTION_TO_ROW_KEY = {
+    "Multi-tenant LMS architecture": "Subdomain-based tenant isolation",
+    "Learner dashboards that focus attention": "Personalised player dashboard (matches, standings, challenges)",
+    "Role-based learning paths": "Role-based access (admin / captain / player)",
+    "Adaptive content sequencing": "Rotating match schedule generation",
+    "Feedback loops with real assessment": "Score entry, dispute, and confirmation flows",
+    "Curriculum roadmap visibility": "Season planner with standings and movement indicators",
+}
+
 
 class TimelineNodeBlock(StructBlock):
     year = CharBlock(
@@ -57,6 +92,11 @@ class TranslationRowBlock(StructBlock):
     screenshot = ImageChooserBlock(
         required=False,
         help_text="Optional QlubPro screenshot shown when the row is expanded.",
+    )
+    audience_tags = ListBlock(
+        ChoiceBlock(choices=AUDIENCE_FOCUS_CHOICES),
+        required=False,
+        help_text="Audience archetypes for which this row is most relevant. Used by the ?role= adaptation.",
     )
 
     class Meta:
@@ -219,5 +259,65 @@ class InteractivePage(Page):
 
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)
-        context["audience_focus"] = self.audience_focus
+
+        param = request.GET.get("role", "") if request else ""
+        from_url = audience_focus_from_url(param)
+        role_explicit = from_url is not None
+        focus = from_url or self.audience_focus
+
+        context["audience_focus"] = focus
+        context["audience_focus_url"] = audience_focus_to_url(focus)
+        context["audience_focus_display"] = dict(AUDIENCE_FOCUS_CHOICES).get(focus, "")
+        context["audience_role_explicit"] = role_explicit
+        context["timeline_nodes_ordered"] = self._order_blocks_by_audience(self.timeline_nodes, focus)
+        context["translation_rows_ordered"] = self._order_blocks_by_audience(self.translation_rows, focus)
+        context["reflection_option_echoes"] = self._build_reflection_echoes()
         return context
+
+    def _build_reflection_echoes(self):
+        """Pair each authored reflection option with its matching translation row.
+
+        Returns a list of dicts the template iterates over to render hidden
+        echo cards — one per option — that reveal inline when the visitor picks
+        that option. An option with no mapping (or a mapping that doesn't
+        resolve to a known row) is omitted.
+        """
+        if not self.reflection or not self.translation_rows:
+            return []
+
+        rows_by_key = {block.value.get("qlubpro_feature"): block.value for block in self.translation_rows}
+
+        try:
+            options = self.reflection[0].value.get("options") or []
+        except (IndexError, AttributeError):
+            return []
+
+        echoes = []
+        for option_text in options:
+            row_key = REFLECTION_OPTION_TO_ROW_KEY.get(option_text)
+            row = rows_by_key.get(row_key) if row_key else None
+            if row is None:
+                continue
+            echoes.append(
+                {
+                    "option": option_text,
+                    "qlubpro_feature": row.get("qlubpro_feature", ""),
+                    "learning_equivalent": row.get("learning_equivalent", ""),
+                    "commentary": row.get("commentary"),
+                }
+            )
+        return echoes
+
+    @staticmethod
+    def _order_blocks_by_audience(stream, focus):
+        """Stable sort: blocks tagged with `focus` come first, then the rest.
+
+        `generic` is treated as 'no preference' — return original order so the
+        editor's authored sequence is respected when no role is selected.
+        """
+        blocks = list(stream)
+        if focus == "generic":
+            return blocks
+        matches = [b for b in blocks if focus in (b.value.get("audience_tags") or [])]
+        rest = [b for b in blocks if focus not in (b.value.get("audience_tags") or [])]
+        return matches + rest
