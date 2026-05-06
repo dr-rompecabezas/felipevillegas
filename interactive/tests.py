@@ -265,13 +265,34 @@ class RoleAdaptationTests(InteractivePageTestCase):
         self.assertEqual(response.context["audience_focus"], "generic")
         self.assertFalse(response.context["audience_role_explicit"])
 
-    def test_explicit_generic_is_recognised(self):
+    def test_explicit_generic_is_recognised_but_not_emphasised(self):
+        # generic is a known choice → audience_role_explicit stays True for
+        # observability. But emphasis (dimming, role pill) must stay OFF —
+        # otherwise the visitor sees every block dimmed for a "no preference"
+        # archetype.
         response = self.client.get("/interactive/?role=generic")
         self.assertEqual(response.status_code, 200)
         ctx = response.context
         self.assertEqual(ctx["audience_focus"], "generic")
-        # generic IS a valid choice, so the role IS explicit
         self.assertTrue(ctx["audience_role_explicit"])
+        self.assertFalse(ctx["audience_emphasis_active"])
+
+        body = response.content.decode("utf-8")
+        # No dimming attribute, no role pill on the page.
+        self.assertIn('data-emphasis-active="false"', body)
+        self.assertNotIn('<p class="role-kicker', body)
+
+    def test_emphasis_active_for_non_generic_role(self):
+        response = self.client.get("/interactive/?role=program-designer")
+        self.assertTrue(response.context["audience_emphasis_active"])
+        body = response.content.decode("utf-8")
+        self.assertIn('data-emphasis-active="true"', body)
+
+    def test_emphasis_inactive_when_no_role_param(self):
+        response = self.client.get("/interactive/")
+        self.assertFalse(response.context["audience_emphasis_active"])
+        body = response.content.decode("utf-8")
+        self.assertIn('data-emphasis-active="false"', body)
 
     def test_all_acceptance_criteria_urls_render(self):
         # Acceptance: each of these URLs must render without error.
@@ -347,6 +368,75 @@ class RoleAdaptationTests(InteractivePageTestCase):
         # The vendored Alpine asset is referenced (not the CDN).
         self.assertIn("alpine.min.js", body)
         self.assertNotIn("cdn.jsdelivr.net/npm/alpinejs", body)
+
+
+class TranslationRowBackfillTests(InteractivePageTestCase):
+    """Validate the data-migration logic that backfills audience_tags on
+    translation rows for pages created before Phase 2.
+
+    The migration itself runs once at deploy time, so we can't easily replay
+    it inside a test transaction. Instead we exercise the migration's pure
+    helpers against simulated stale and partially-migrated data.
+    """
+
+    @staticmethod
+    def _migration_module():
+        import importlib  # noqa: PLC0415
+
+        return importlib.import_module("interactive.migrations.0004_backfill_translation_row_audience_tags")
+
+    def test_helper_adds_missing_tags_and_leaves_present_ones(self):
+        patch = self._migration_module()._patch_blocks
+
+        blocks = [
+            {
+                "type": "translation_row",
+                "value": {
+                    "qlubpro_feature": "Subdomain-based tenant isolation",
+                    "learning_equivalent": "Multi-org LMS architecture",
+                    "audience_tags": [],  # stale, empty list
+                },
+            },
+            {
+                "type": "translation_row",
+                "value": {
+                    "qlubpro_feature": "Rotating match schedule generation",
+                    "learning_equivalent": "Adaptive content sequencing",
+                    "audience_tags": ["program_designer"],  # already present, untouched
+                },
+            },
+            {
+                "type": "translation_row",
+                "value": {
+                    "qlubpro_feature": "An unmapped feature",
+                    "learning_equivalent": "Something",
+                },
+            },
+        ]
+        changed = patch(blocks)
+        self.assertTrue(changed)
+        self.assertEqual(
+            blocks[0]["value"]["audience_tags"],
+            ["lms_architect", "learning_engineer"],
+        )
+        self.assertEqual(
+            blocks[1]["value"]["audience_tags"],
+            ["program_designer"],
+        )
+        self.assertNotIn("audience_tags", blocks[2]["value"])
+
+    def test_helper_is_noop_when_all_blocks_already_tagged(self):
+        patch = self._migration_module()._patch_blocks
+        blocks = [
+            {
+                "type": "translation_row",
+                "value": {
+                    "qlubpro_feature": "Subdomain-based tenant isolation",
+                    "audience_tags": ["lms_architect"],
+                },
+            },
+        ]
+        self.assertFalse(patch(blocks))
 
 
 class ReflectionEchoTests(InteractivePageTestCase):

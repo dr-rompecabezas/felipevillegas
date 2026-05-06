@@ -160,18 +160,20 @@
     transition: transform 0.2s ease;
     align-self: center;
   }
-  .interactive-page .timeline-node[aria-expanded="true"] .chev {
+  .interactive-page .timeline-node .toggle[aria-expanded="true"] .chev {
     transform: rotate(90deg);
   }
   .interactive-page .timeline-node .body {
     overflow: hidden;
   }
-  /* Audience emphasis: when an explicit role is selected, dim non-matching nodes */
-  .interactive-page[data-role-explicit="true"] .timeline-node:not(.is-match) {
+  /* Audience emphasis: when a non-generic explicit role is selected, dim
+     non-matching nodes. Glow on matched nodes derives from --page-accent so
+     the colour stays consistent with the configured page accent. */
+  .interactive-page[data-emphasis-active="true"] .timeline-node:not(.is-match) {
     opacity: 0.45;
   }
-  .interactive-page[data-role-explicit="true"] .timeline-node.is-match::before {
-    box-shadow: 0 0 0 4px rgba(196, 98, 45, 0.12);
+  .interactive-page[data-emphasis-active="true"] .timeline-node.is-match::before {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--page-accent) 12%, transparent);
   }
 
   /* Translation rows */
@@ -214,7 +216,7 @@
     color: #5C5A54;
     transition: color 0.3s ease;
   }
-  .interactive-page .translation-row[aria-expanded="true"] .qlubpro-side {
+  .interactive-page .translation-row .translation-toggle[aria-expanded="true"] .qlubpro-side {
     color: #8A8880;
   }
   .interactive-page .translation-pair .arrow {
@@ -225,7 +227,7 @@
     user-select: none;
     transition: transform 0.3s ease;
   }
-  .interactive-page .translation-row[aria-expanded="true"] .arrow {
+  .interactive-page .translation-row .translation-toggle[aria-expanded="true"] .arrow {
     transform: translateX(2px);
   }
   @media (max-width: 767px) {
@@ -244,7 +246,7 @@
     color: #1A1A18;
     transition: color 0.3s ease;
   }
-  .interactive-page .translation-row[aria-expanded="true"] .learning-side {
+  .interactive-page .translation-row .translation-toggle[aria-expanded="true"] .learning-side {
     color: var(--page-accent);
   }
   .interactive-page .translation-pair .row-chev {
@@ -253,7 +255,7 @@
     align-self: center;
     transition: transform 0.2s ease;
   }
-  .interactive-page .translation-row[aria-expanded="true"] .row-chev {
+  .interactive-page .translation-row .translation-toggle[aria-expanded="true"] .row-chev {
     transform: rotate(90deg);
   }
   .interactive-page .translation-row .commentary {
@@ -271,7 +273,7 @@
     max-width: 32rem;
     border: 1px solid #E8E4DC;
   }
-  .interactive-page[data-role-explicit="true"] .translation-row:not(.is-match) {
+  .interactive-page[data-emphasis-active="true"] .translation-row:not(.is-match) {
     opacity: 0.55;
   }
 
@@ -509,7 +511,7 @@
 <article class="interactive-page bg-surface text-ink"
          x-data="interactivePage()"
          data-audience-focus="{{ audience_focus }}"
-         data-role-explicit="{% if audience_role_explicit %}true{% else %}false{% endif %}">
+         data-emphasis-active="{% if audience_emphasis_active %}true{% else %}false{% endif %}">
 
   {# Scroll progress — six dots, one per major section ----------------------- #}
   <aside class="scroll-progress" aria-label="Section navigation">
@@ -526,7 +528,7 @@
   {# 1 — Hero ----------------------------------------------------------------- #}
   <section id="section-hero" class="hero" aria-labelledby="hero-statement" data-section-id="hero">
     <div class="section-frame w-full">
-      {% if audience_role_explicit and audience_focus_display %}
+      {% if audience_emphasis_active and audience_focus_display %}
         <p class="role-kicker fade-up">
           <span class="dot" aria-hidden="true"></span>
           For {{ audience_focus_display }}
@@ -562,9 +564,8 @@
 
       <ol class="timeline">
         {% for block in timeline_nodes_ordered %}
-          <li class="timeline-node fade-up{% if audience_role_explicit and audience_focus in block.value.audience_tags %} is-match{% endif %}"
+          <li class="timeline-node fade-up{% if audience_emphasis_active and audience_focus in block.value.audience_tags %} is-match{% endif %}"
               x-data="{ open: false }"
-              :aria-expanded="open"
               data-audience-tags="{% for tag in block.value.audience_tags %}{{ tag }}{% if not forloop.last %} {% endif %}{% endfor %}">
             <button type="button" class="toggle" @click="open = !open" :aria-expanded="open">
               <span>
@@ -607,9 +608,8 @@
 
       <ol class="list-none p-0 m-0">
         {% for block in translation_rows_ordered %}
-          <li class="translation-row{% if audience_role_explicit and audience_focus in block.value.audience_tags %} is-match{% endif %}"
-              x-data="{ open: false }"
-              :aria-expanded="open">
+          <li class="translation-row{% if audience_emphasis_active and audience_focus in block.value.audience_tags %} is-match{% endif %}"
+              x-data="{ open: false }">
             <button type="button" class="translation-toggle" @click="open = !open" :aria-expanded="open">
               <div class="translation-pair">
                 <span class="qlubpro-side">{{ block.value.qlubpro_feature }}</span>

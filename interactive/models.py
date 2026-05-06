@@ -269,6 +269,10 @@ class InteractivePage(Page):
         context["audience_focus_url"] = audience_focus_to_url(focus)
         context["audience_focus_display"] = dict(AUDIENCE_FOCUS_CHOICES).get(focus, "")
         context["audience_role_explicit"] = role_explicit
+        # Emphasis (dimming, role pill) only kicks in for a non-generic explicit
+        # role. `generic` is recognised but treated as 'no preference' so a
+        # visitor opting into generic doesn't see every block dimmed.
+        context["audience_emphasis_active"] = role_explicit and focus != "generic"
         context["timeline_nodes_ordered"] = self._order_blocks_by_audience(self.timeline_nodes, focus)
         context["translation_rows_ordered"] = self._order_blocks_by_audience(self.translation_rows, focus)
         context["reflection_option_echoes"] = self._build_reflection_echoes()
