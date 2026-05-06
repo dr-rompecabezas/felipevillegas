@@ -6,8 +6,10 @@ reply. There is no conversation history stored or replayed.
 
 Cost and abuse controls are layered, all keyed by client IP:
     1. Hard input length cap (cheap rejection before any model call).
-    2. Per-IP requests-per-minute throttle (sliding window via cache).
-    3. Per-IP daily input + output token budgets (cumulative via cache).
+    2. Per-IP requests-per-minute throttle (atomic per-minute bucket).
+    3. Per-IP daily input + output token budgets (atomic counters).
+    4. `max_tokens` clamped to remaining output budget so a single response
+       cannot overshoot the daily cap.
 
 Standard Django CSRF applies — the client must send X-CSRFToken.
 """
@@ -30,14 +32,20 @@ logger = logging.getLogger(__name__)
 
 
 def _client_ip(request: HttpRequest) -> str:
-    """Best-effort client IP for rate-limit and budget keys.
+    """Resolve the client IP for rate-limit and budget keys.
 
-    Trusts the leftmost X-Forwarded-For value when present (Railway sets it),
-    falling back to REMOTE_ADDR otherwise.
+    With `CHAT_TRUSTED_PROXY_COUNT=N`, take the Nth-from-the-right value of
+    X-Forwarded-For. Anything to the left is client-supplied and untrusted, so
+    a forged leftmost entry cannot be used to spoof past the trusted hops.
+    Falls back to REMOTE_ADDR when XFF is missing or has fewer entries than
+    the trusted count.
     """
+    trusted = max(getattr(settings, "CHAT_TRUSTED_PROXY_COUNT", 1), 0)
     xff = request.headers.get("x-forwarded-for", "")
-    if xff:
-        return xff.split(",")[0].strip()
+    if xff and trusted > 0:
+        parts = [p.strip() for p in xff.split(",") if p.strip()]
+        if len(parts) >= trusted:
+            return parts[-trusted]
     return request.META.get("REMOTE_ADDR", "0.0.0.0")
 
 
@@ -52,17 +60,12 @@ def _seconds_until_midnight() -> int:
 
 
 def _rpm_check(ip: str) -> bool:
-    """Sliding-window RPM check. Returns True if the request is allowed."""
-    key = f"chat:rpm:{ip}"
-    now = time.time()
-    window_start = now - 60
-    timestamps = cache.get(key) or []
-    timestamps = [t for t in timestamps if t > window_start]
-    if len(timestamps) >= settings.CHAT_RPM:
-        return False
-    timestamps.append(now)
-    cache.set(key, timestamps, timeout=120)
-    return True
+    """Atomic per-minute fixed-bucket RPM check. Returns True if allowed."""
+    bucket = int(time.time() // 60)
+    key = f"chat:rpm:{ip}:{bucket}"
+    cache.add(key, 0, timeout=90)
+    new_count = cache.incr(key)
+    return new_count <= settings.CHAT_RPM
 
 
 def _budget_remaining(ip: str) -> tuple[int, int]:
@@ -77,12 +80,17 @@ def _budget_remaining(ip: str) -> tuple[int, int]:
 
 
 def _record_usage(ip: str, input_tokens: int, output_tokens: int) -> None:
+    """Atomically record token usage so concurrent requests do not undercount."""
     day = _today_key()
     ttl = _seconds_until_midnight()
     in_key = f"chat:in:{ip}:{day}"
     out_key = f"chat:out:{ip}:{day}"
-    cache.set(in_key, (cache.get(in_key) or 0) + input_tokens, timeout=ttl)
-    cache.set(out_key, (cache.get(out_key) or 0) + output_tokens, timeout=ttl)
+    cache.add(in_key, 0, timeout=ttl)
+    cache.add(out_key, 0, timeout=ttl)
+    if input_tokens:
+        cache.incr(in_key, input_tokens)
+    if output_tokens:
+        cache.incr(out_key, output_tokens)
 
 
 def _err(code: str, message: str, status: int, **extra) -> JsonResponse:
@@ -139,10 +147,14 @@ def chat(request: HttpRequest) -> JsonResponse:
     system_prompt = page.chat_system_prompt or ""
     client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
 
+    # Cap max_tokens to what's left of today's output budget so a single
+    # response cannot overshoot the daily cap. Anthropic requires >= 1.
+    max_tokens = max(min(settings.CHAT_MAX_OUTPUT_TOKENS, output_remaining), 1)
+
     try:
         response = client.messages.create(
             model=settings.ANTHROPIC_MODEL,
-            max_tokens=settings.CHAT_MAX_OUTPUT_TOKENS,
+            max_tokens=max_tokens,
             system=system_prompt,
             messages=[{"role": "user", "content": user_message}],
         )

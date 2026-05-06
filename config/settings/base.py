@@ -116,3 +116,7 @@ CHAT_DAILY_OUTPUT_TOKEN_BUDGET = config("CHAT_DAILY_OUTPUT_TOKEN_BUDGET", defaul
 CHAT_RPM = config("CHAT_RPM", default=6, cast=int)
 CHAT_INPUT_MAX_CHARS = config("CHAT_INPUT_MAX_CHARS", default=1000, cast=int)
 CHAT_MAX_OUTPUT_TOKENS = config("CHAT_MAX_OUTPUT_TOKENS", default=400, cast=int)
+# How many trusted proxies sit in front of Django. The chat view picks the
+# Nth-from-the-right entry in X-Forwarded-For so a client cannot spoof their
+# IP past the trusted hop count. Railway = 1.
+CHAT_TRUSTED_PROXY_COUNT = config("CHAT_TRUSTED_PROXY_COUNT", default=1, cast=int)

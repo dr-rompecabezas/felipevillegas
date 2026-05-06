@@ -932,6 +932,7 @@
           {% endif %}
 
           <form class="chat-form" @submit.prevent="ask(userInput)">
+            {% csrf_token %}
             <label class="sr-only" for="chat-input">Your question</label>
             <textarea id="chat-input"
                       class="chat-input"
@@ -995,45 +996,81 @@
     return match ? decodeURIComponent(match[1]) : '';
   }
 
-  // Tiny markdown renderer for chat replies. Escapes HTML first, then
-  // converts a small allowlist of inline markers and block structures.
-  // Anything not listed here is rendered as plain text.
+  // Tiny markdown renderer for chat replies. Escapes HTML first; links are
+  // built via DOM APIs so attribute values are never produced by string
+  // interpolation. URLs are validated against an http(s)/mailto allowlist.
+  // Anything not in the allowlist is rendered as plain text.
   function renderChatMarkdown(src) {
     if (!src) return '';
+
     const escape = (s) => s
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
-    const inline = (s) => s
-      // Bold: **text** or __text__
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+
+    const safeUrl = (raw) => {
+      try {
+        const u = new URL(raw);
+        if (u.protocol === 'http:' || u.protocol === 'https:' || u.protocol === 'mailto:') {
+          return u.href;
+        }
+      } catch (_) { /* fallthrough → null */ }
+      return null;
+    };
+
+    // Build an anchor via the DOM, returning safe outerHTML. The browser
+    // does the attribute-value escaping, so a forged URL cannot break out.
+    const linkHtml = (text, url) => {
+      const valid = safeUrl(url);
+      if (!valid) return escape(`[${text}](${url})`);
+      const a = document.createElement('a');
+      a.href = valid;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.textContent = text;
+      return a.outerHTML;
+    };
+
+    // Inline transforms applied to a text segment that contains no link.
+    // Operates on already-escaped HTML so injected tags cannot survive.
+    const inlineNoLink = (s) => escape(s)
       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
       .replace(/__(.+?)__/g, '<strong>$1</strong>')
-      // Italic: *text* or _text_ (avoid eating ** or __ already handled)
       .replace(/(^|[^\*])\*([^\*\n]+?)\*(?!\*)/g, '$1<em>$2</em>')
       .replace(/(^|[^_])_([^_\n]+?)_(?!_)/g, '$1<em>$2</em>')
-      // Inline code: `text`
-      .replace(/`([^`\n]+?)`/g, '<code>$1</code>')
-      // Links: [text](https://…) — http/https/mailto only
-      .replace(
-        /\[([^\]]+)\]\((https?:\/\/[^\s)]+|mailto:[^\s)]+)\)/g,
-        '<a href="$2" target="_blank" rel="noopener">$1</a>'
-      );
+      .replace(/`([^`\n]+?)`/g, '<code>$1</code>');
 
-    const blocks = escape(src).split(/\n{2,}/);
-    return blocks
-      .map((block) => {
-        const lines = block.split('\n');
-        const isUl = lines.every((l) => /^\s*[-*]\s+/.test(l));
-        const isOl = lines.every((l) => /^\s*\d+\.\s+/.test(l));
-        if (isUl) {
-          return '<ul>' + lines.map((l) => '<li>' + inline(l.replace(/^\s*[-*]\s+/, '')) + '</li>').join('') + '</ul>';
-        }
-        if (isOl) {
-          return '<ol>' + lines.map((l) => '<li>' + inline(l.replace(/^\s*\d+\.\s+/, '')) + '</li>').join('') + '</ol>';
-        }
-        return '<p>' + inline(block).replace(/\n/g, '<br>') + '</p>';
-      })
-      .join('');
+    // Walk the raw input, splitting around link matches so URL chars
+    // (including `&`, `?`, `=`) are not HTML-escaped before validation.
+    // The link text and surrounding prose still go through inlineNoLink.
+    const inline = (raw) => {
+      const linkRe = /\[([^\]]+)\]\(([^\s"'<>)]+)\)/g;
+      let out = '';
+      let last = 0;
+      let m;
+      while ((m = linkRe.exec(raw)) !== null) {
+        out += inlineNoLink(raw.slice(last, m.index));
+        out += linkHtml(m[1], m[2]);
+        last = linkRe.lastIndex;
+      }
+      out += inlineNoLink(raw.slice(last));
+      return out;
+    };
+
+    return src.split(/\n{2,}/).map((block) => {
+      const lines = block.split('\n');
+      const isUl = lines.every((l) => /^\s*[-*]\s+/.test(l));
+      const isOl = lines.every((l) => /^\s*\d+\.\s+/.test(l));
+      if (isUl) {
+        return '<ul>' + lines.map((l) => '<li>' + inline(l.replace(/^\s*[-*]\s+/, '')) + '</li>').join('') + '</ul>';
+      }
+      if (isOl) {
+        return '<ol>' + lines.map((l) => '<li>' + inline(l.replace(/^\s*\d+\.\s+/, '')) + '</li>').join('') + '</ol>';
+      }
+      return '<p>' + inline(block).replace(/\n/g, '<br>') + '</p>';
+    }).join('');
   }
 
   function interactiveChat({ budget, maxChars }) {
@@ -1076,7 +1113,10 @@
           const data = await response.json().catch(() => ({}));
           if (!response.ok) {
             this.ctaMessage = data.message || 'The chat is unavailable right now.';
-            if (response.status === 429 || response.status === 502 || response.status === 503) {
+            // RPM throttles recover on their own — keep the widget open. Only
+            // permanent stops (budget exhausted, chat disabled, upstream down)
+            // disable the input.
+            if (data.error === 'budget_exhausted' || data.error === 'disabled' || data.error === 'upstream_error') {
               this.closed = true;
             }
             return;

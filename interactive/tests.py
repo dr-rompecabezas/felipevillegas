@@ -542,12 +542,13 @@ class ChatViewTests(InteractivePageTestCase):
         url = reverse("interactive:chat")
         headers = {"REMOTE_ADDR": ip, "content_type": "application/json"}
         if with_csrf:
-            from django.middleware.csrf import get_token
-
-            request = self.client.get("/interactive/", REMOTE_ADDR=ip).wsgi_request
-            token = get_token(request)
-            self.client.cookies["csrftoken"] = token
-            headers["HTTP_X_CSRFTOKEN"] = token
+            # The page now renders {% csrf_token %} inside the chat form, so
+            # the GET response sets the csrftoken cookie naturally — no manual
+            # cookie injection required.
+            self.client.get("/interactive/", REMOTE_ADDR=ip)
+            cookie = self.client.cookies.get("csrftoken")
+            self.assertIsNotNone(cookie, "GET to /interactive/ must seed csrftoken cookie")
+            headers["HTTP_X_CSRFTOKEN"] = cookie.value
         return self.client.post(url, data=json.dumps(payload), **headers)
 
     def test_csrf_rejects_request_without_token(self):
@@ -615,10 +616,24 @@ class ChatViewTests(InteractivePageTestCase):
         self.assertIn("contact_email", body)
 
     def test_chat_disabled_when_flag_off(self):
+        from django.middleware.csrf import get_token
+
         self.page.chat_enabled = False
         self.page.save_revision().publish()
+        # The form (and its {% csrf_token %}) doesn't render when disabled,
+        # so seed a valid token directly to get past CSRF middleware and
+        # actually reach the view's chat_enabled check.
+        request = self.client.get("/interactive/").wsgi_request
+        token = get_token(request)
+        self.client.cookies["csrftoken"] = token
         with patch("interactive.views.anthropic.Anthropic") as client_cls:
-            response = self._post({"message": "Hi"})
+            response = self.client.post(
+                reverse("interactive:chat"),
+                data=json.dumps({"message": "Hi"}),
+                content_type="application/json",
+                headers={"x-csrftoken": token},
+                REMOTE_ADDR="10.0.0.1",
+            )
         self.assertEqual(response.status_code, 404)
         client_cls.assert_not_called()
 
@@ -653,3 +668,102 @@ class ChatStartersTests(InteractivePageTestCase):
         # At least one of the seeded starter questions should appear as a chip.
         self.assertIn('class="chat-starter"', body)
         self.assertIn("How does QlubPro", body)
+
+
+class ClientIpResolutionTests(TestCase):
+    """`_client_ip` must not let a forged X-Forwarded-For value spoof the IP
+    used for rate-limit and budget keys. With CHAT_TRUSTED_PROXY_COUNT=N, the
+    Nth-from-the-right entry is taken — anything to the left is untrusted.
+    """
+
+    @staticmethod
+    def _request(xff: str | None, remote_addr: str = "10.0.0.1"):
+        from django.test import RequestFactory
+
+        rf = RequestFactory()
+        headers = {"REMOTE_ADDR": remote_addr}
+        if xff is not None:
+            headers["HTTP_X_FORWARDED_FOR"] = xff
+        return rf.get("/api/interactive/chat/", **headers)
+
+    @override_settings(CHAT_TRUSTED_PROXY_COUNT=1)
+    def test_single_proxy_returns_rightmost_xff(self):
+        from interactive.views import _client_ip
+
+        # Attacker-supplied "1.2.3.4" on the left, real client "9.9.9.9" appended
+        # by the trusted proxy on the right.
+        req = self._request(xff="1.2.3.4, 9.9.9.9")
+        self.assertEqual(_client_ip(req), "9.9.9.9")
+
+    @override_settings(CHAT_TRUSTED_PROXY_COUNT=1)
+    def test_falls_back_to_remote_addr_when_no_xff(self):
+        from interactive.views import _client_ip
+
+        req = self._request(xff=None, remote_addr="10.0.0.7")
+        self.assertEqual(_client_ip(req), "10.0.0.7")
+
+    @override_settings(CHAT_TRUSTED_PROXY_COUNT=2)
+    def test_two_proxies_skips_one_more_from_the_right(self):
+        from interactive.views import _client_ip
+
+        # XFF: client, proxy1, proxy2 → with two trusted hops, the client is
+        # the second entry.
+        req = self._request(xff="9.9.9.9, 10.0.0.1, 10.0.0.2")
+        self.assertEqual(_client_ip(req), "10.0.0.1")
+
+
+@override_settings(
+    ANTHROPIC_API_KEY="test-key",
+    CHAT_DAILY_INPUT_TOKEN_BUDGET=200,
+    CHAT_DAILY_OUTPUT_TOKEN_BUDGET=100,
+    CHAT_RPM=2,
+    CHAT_INPUT_MAX_CHARS=120,
+    CHAT_MAX_OUTPUT_TOKENS=50,
+)
+class ChatRateLimitRecoverableTests(InteractivePageTestCase):
+    """The frontend must keep the widget open on RPM throttles and only close
+    on permanent stops. The contract is the `error` field on the response, so
+    we pin its value here.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.client = Client(enforce_csrf_checks=True)
+        page = InteractivePage(
+            title="Interactive",
+            slug="interactive",
+            live=True,
+            chat_enabled=True,
+            chat_system_prompt="You are a test assistant.",
+        )
+        self.home.add_child(instance=page)
+        cache.clear()
+
+    def test_rate_limited_error_string_is_distinct_from_budget(self):
+        url = reverse("interactive:chat")
+        self.client.get("/interactive/", REMOTE_ADDR="10.0.0.42")
+        token = self.client.cookies.get("csrftoken").value
+        with patch("interactive.views.anthropic.Anthropic") as client_cls:
+            client_cls.return_value.messages.create.return_value = _fake_anthropic_response()
+            for _ in range(2):  # CHAT_RPM=2
+                self.client.post(
+                    url,
+                    data=json.dumps({"message": "Hi"}),
+                    content_type="application/json",
+                    headers={"x-csrftoken": token},
+                    REMOTE_ADDR="10.0.0.42",
+                )
+            blocked = self.client.post(
+                url,
+                data=json.dumps({"message": "Hi"}),
+                content_type="application/json",
+                headers={"x-csrftoken": token},
+                REMOTE_ADDR="10.0.0.42",
+            )
+        self.assertEqual(blocked.status_code, 429)
+        body = blocked.json()
+        # The frontend keys "permanent close" off `error` — `rate_limited`
+        # must stay distinct from `budget_exhausted` so transient throttles
+        # don't lock users out until reload.
+        self.assertEqual(body["error"], "rate_limited")
+        self.assertNotEqual(body["error"], "budget_exhausted")
