@@ -1,0 +1,464 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block title %}{% if page.seo_title %}{{ page.seo_title }} | Felipe Villegas{% else %}Interactive — Felipe Villegas{% endif %}{% endblock %}
+
+{% block meta_description %}{% if page.search_description %}{{ page.search_description }}{% else %}A learning experience about a learning designer. Felipe Villegas — twenty years in L&D, full-stack in Django.{% endif %}{% endblock %}
+
+{% block extra_head %}
+<style>
+  .interactive-page {
+    --page-accent: {{ page.accent_color }};
+  }
+  .interactive-page .accent-rule {
+    background-color: var(--page-accent);
+  }
+  .interactive-page .accent-text {
+    color: var(--page-accent);
+  }
+  .interactive-page .accent-border {
+    border-color: var(--page-accent);
+  }
+  .interactive-page ::selection {
+    background-color: var(--page-accent);
+    color: #FAF7F2;
+  }
+
+  /* Section frame */
+  .interactive-page .section-frame {
+    max-width: 56rem;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+  @media (min-width: 1024px) {
+    .interactive-page .section-frame { padding-left: 2.5rem; padding-right: 2.5rem; }
+  }
+
+  /* Hero */
+  .interactive-page .hero {
+    min-height: calc(100vh - 3.5rem);
+    display: flex;
+    align-items: center;
+  }
+  .interactive-page .hero-statement {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    font-size: clamp(2.25rem, 6vw, 4.5rem);
+    color: #1A1A18;
+    margin-bottom: 1.5rem;
+  }
+  .interactive-page .hero-statement p + p {
+    font-style: normal;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: clamp(1rem, 1.5vw, 1.125rem);
+    line-height: 1.7;
+    color: #5C5A54;
+    margin-top: 2rem;
+    max-width: 36rem;
+  }
+
+  /* Timeline */
+  .interactive-page .timeline {
+    position: relative;
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+  }
+  .interactive-page .timeline::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, #D4CFC5 8%, #D4CFC5 92%, transparent);
+  }
+  .interactive-page .timeline-node {
+    position: relative;
+    padding-left: 2.5rem;
+    padding-top: 0.5rem;
+    padding-bottom: 3rem;
+  }
+  .interactive-page .timeline-node::before {
+    content: "";
+    position: absolute;
+    left: -3.5px;
+    top: 1.1rem;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--page-accent);
+  }
+  .interactive-page .timeline-node .year {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    color: var(--page-accent);
+    line-height: 1;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  .interactive-page .timeline-node .label {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-weight: 500;
+    font-size: 1rem;
+    color: #1A1A18;
+    margin-bottom: 0.75rem;
+    text-transform: none;
+  }
+
+  /* Translation rows */
+  .interactive-page .translation-row {
+    border-top: 1px solid #E8E4DC;
+    padding: 1.75rem 0;
+  }
+  .interactive-page .translation-row:last-child {
+    border-bottom: 1px solid #E8E4DC;
+  }
+  .interactive-page .translation-pair {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem 1.25rem;
+    align-items: baseline;
+  }
+  @media (min-width: 768px) {
+    .interactive-page .translation-pair {
+      grid-template-columns: 1fr auto 1fr;
+    }
+  }
+  .interactive-page .translation-pair .qlubpro-side {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 1rem;
+    color: #5C5A54;
+  }
+  .interactive-page .translation-pair .arrow {
+    color: var(--page-accent);
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 1rem;
+    text-align: center;
+    user-select: none;
+  }
+  @media (max-width: 767px) {
+    .interactive-page .translation-pair .arrow {
+      text-align: left;
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #8A8880;
+    }
+  }
+  .interactive-page .translation-pair .learning-side {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-style: italic;
+    font-size: 1.125rem;
+    color: #1A1A18;
+  }
+  .interactive-page .translation-row .commentary {
+    margin-top: 1rem;
+    max-width: 44rem;
+  }
+  .interactive-page .translation-row .commentary p {
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: #5C5A54;
+  }
+  .interactive-page .translation-row .screenshot {
+    margin-top: 1rem;
+    max-width: 32rem;
+    border: 1px solid #E8E4DC;
+  }
+
+  /* AI cards */
+  .interactive-page .ai-cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  @media (min-width: 768px) {
+    .interactive-page .ai-cards {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  .interactive-page .ai-card {
+    background: white;
+    border: 1px solid #E8E4DC;
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+  }
+  .interactive-page .ai-card h3 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 400;
+    font-size: 1.25rem;
+    color: #1A1A18;
+    line-height: 1.3;
+    margin-bottom: 0.75rem;
+  }
+  .interactive-page .ai-card .summary p {
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: #5C5A54;
+    margin-bottom: 0.75em;
+  }
+  .interactive-page .ai-card .card-link {
+    margin-top: auto;
+    padding-top: 1rem;
+    color: var(--page-accent);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* Reflection */
+  .interactive-page .reflection {
+    background: #F5EFE6;
+    border-left: 2px solid var(--page-accent);
+    padding: 2rem 2rem;
+  }
+  .interactive-page .reflection .prompt {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-style: italic;
+    font-size: clamp(1.25rem, 2.5vw, 1.625rem);
+    line-height: 1.4;
+    color: #1A1A18;
+    margin-bottom: 1.5rem;
+    max-width: 38rem;
+  }
+  .interactive-page .reflection .options {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .interactive-page .reflection .options li {
+    background: white;
+    border: 1px solid #D4CFC5;
+    padding: 0.5rem 0.875rem;
+    font-size: 0.875rem;
+    color: #3A3835;
+  }
+
+  /* Chat placeholder */
+  .interactive-page .chat-placeholder {
+    border: 1px dashed #D4CFC5;
+    padding: 2rem;
+    text-align: center;
+    color: #8A8880;
+  }
+  .interactive-page .chat-placeholder .label {
+    font-size: 0.625rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Closing */
+  .interactive-page .closing .employer-line {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--page-accent);
+    margin-bottom: 1.25rem;
+  }
+  .interactive-page .closing .editorial-body p {
+    font-size: 1.0625rem;
+    line-height: 1.75;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<article class="interactive-page bg-surface text-ink">
+
+  {# 1 — Hero ----------------------------------------------------------------- #}
+  <section class="hero" aria-labelledby="hero-statement">
+    <div class="section-frame w-full">
+      {% if page.hero_kicker %}
+        <p class="section-label mb-6 fade-up">{{ page.hero_kicker }}</p>
+      {% endif %}
+      <div id="hero-statement" class="hero-statement editorial-body fade-up-1">
+        {{ page.hero_statement|richtext }}
+      </div>
+      <div class="mt-12 flex items-center gap-3 fade-up-3" aria-hidden="true">
+        <span class="block w-12 h-px accent-rule"></span>
+        <span class="text-[0.6875rem] tracking-editorial-sm uppercase text-warm-500">Scroll</span>
+      </div>
+    </div>
+  </section>
+
+  {# 2 — Timeline ------------------------------------------------------------- #}
+  <section class="py-24 sm:py-32" aria-labelledby="timeline-heading">
+    <div class="section-frame">
+      <header class="mb-14 fade-up">
+        <p class="section-label mb-4">Module One</p>
+        <h2 id="timeline-heading" class="font-display text-3xl sm:text-4xl text-ink leading-[1.15]">
+          Twenty years to this moment.
+        </h2>
+        <p class="mt-4 text-warm-600 max-w-2xl">
+          Nine inflection points. Each one is a place where the work changed shape.
+          Together they explain how a learning designer ended up writing the application
+          you're reading.
+        </p>
+      </header>
+
+      <ol class="timeline">
+        {% for block in page.timeline_nodes %}
+          <li class="timeline-node fade-up"
+              data-audience-tags="{% for tag in block.value.audience_tags %}{{ tag }}{% if not forloop.last %} {% endif %}{% endfor %}">
+            <span class="year">{{ block.value.year }}</span>
+            <h3 class="label">{{ block.value.label }}</h3>
+            <div class="editorial-body">{{ block.value.body|richtext }}</div>
+          </li>
+        {% endfor %}
+      </ol>
+    </div>
+  </section>
+
+  {# 3 — QlubPro → Learning translation -------------------------------------- #}
+  <section class="py-24 sm:py-32 bg-warm-50" aria-labelledby="translation-heading">
+    <div class="section-frame">
+      <header class="mb-12 fade-up">
+        <p class="section-label mb-4">Module Two</p>
+        <h2 id="translation-heading" class="font-display text-3xl sm:text-4xl text-ink leading-[1.15]">
+          A learning platform in disguise.
+        </h2>
+        <p class="mt-4 text-warm-600 max-w-2xl">
+          QlubPro is a tennis-club SaaS. Its architecture is the same shape as a
+          modern LMS. Eight patterns, translated.
+        </p>
+        <p class="mt-3 italic font-display text-warm-500">
+          I haven't built a learning platform yet. I've built the same system for a
+          different domain. The architecture transfers.
+        </p>
+      </header>
+
+      <ol class="list-none p-0 m-0">
+        {% for block in page.translation_rows %}
+          <li class="translation-row">
+            <div class="translation-pair">
+              <div class="qlubpro-side">{{ block.value.qlubpro_feature }}</div>
+              <div class="arrow" aria-hidden="true">→</div>
+              <div class="learning-side">{{ block.value.learning_equivalent }}</div>
+            </div>
+            {% if block.value.commentary %}
+              <div class="commentary editorial-body">{{ block.value.commentary|richtext }}</div>
+            {% endif %}
+            {% if block.value.screenshot %}
+              <div class="screenshot">
+                {% image block.value.screenshot fill-1024x576 format-webp class="block w-full h-auto" %}
+              </div>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ol>
+    </div>
+  </section>
+
+  {# 4 — AI in practice ------------------------------------------------------ #}
+  <section class="py-24 sm:py-32" aria-labelledby="ai-heading">
+    <div class="section-frame">
+      <header class="mb-12 fade-up">
+        <p class="section-label mb-4">Module Three</p>
+        <h2 id="ai-heading" class="font-display text-3xl sm:text-4xl text-ink leading-[1.15]">
+          AI in practice — honestly.
+        </h2>
+        <p class="mt-4 text-warm-600 max-w-2xl">
+          Three projects. The first is the most polished; the others are
+          prototype-scale. Together they show the trajectory and the discipline.
+        </p>
+      </header>
+
+      <div class="ai-cards">
+        {% for block in page.ai_cards %}
+          <article class="ai-card fade-up">
+            <h3>{{ block.value.title }}</h3>
+            <div class="summary editorial-body">{{ block.value.summary|richtext }}</div>
+            {% if block.value.link %}
+              <a class="card-link" href="{{ block.value.link }}" target="_blank" rel="noopener">
+                {{ block.value.link_label|default:"View" }}
+                <span aria-hidden="true">→</span>
+              </a>
+            {% endif %}
+          </article>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  {# 5 — Reflection (interactive ID beat) ------------------------------------ #}
+  {% for block in page.reflection %}
+    <section class="py-20" aria-labelledby="reflection-prompt">
+      <div class="section-frame">
+        <div class="reflection fade-up">
+          <p class="section-label mb-4">A pause</p>
+          <p id="reflection-prompt" class="prompt">{{ block.value.prompt }}</p>
+          <ul class="options" role="list">
+            {% for option in block.value.options %}
+              <li>{{ option }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </section>
+  {% endfor %}
+
+  {# 6 — Chat (Phase 3) — placeholder when chat_enabled is true ------------- #}
+  {% if page.chat_enabled %}
+    <section class="py-20" aria-labelledby="chat-heading">
+      <div class="section-frame">
+        <header class="mb-8 fade-up">
+          <p class="section-label mb-4">Module Four</p>
+          <h2 id="chat-heading" class="font-display text-3xl sm:text-4xl text-ink leading-[1.15]">
+            Ask me anything (within reason).
+          </h2>
+          <p class="mt-4 text-warm-600 max-w-2xl">
+            The chat is single-turn, scoped to questions about Felipe's work and
+            approach to learning technology. Coming online in the next iteration.
+          </p>
+        </header>
+        <div class="chat-placeholder fade-up">
+          <p class="label">Coming soon</p>
+          <p class="font-display italic text-lg">Until then, reach out directly.</p>
+          <p class="mt-2 text-sm">
+            <a class="accent-text" href="mailto:f.villegas@thinkelearn.com">f.villegas@thinkelearn.com</a>
+          </p>
+        </div>
+      </div>
+    </section>
+  {% endif %}
+
+  {# 7 — Closing ------------------------------------------------------------- #}
+  <section class="py-24 sm:py-32 border-t border-warm-200" aria-labelledby="closing-heading">
+    <div class="section-frame">
+      <div class="closing fade-up">
+        <p class="section-label mb-6">In closing</p>
+        {% if page.show_employer_section and page.target_company %}
+          <p class="employer-line">
+            {% if page.target_role %}{{ page.target_role }} · {% endif %}{{ page.target_company }}
+          </p>
+        {% endif %}
+        <h2 id="closing-heading" class="font-display text-3xl sm:text-4xl text-ink leading-[1.15] mb-8">
+          The page is the argument.
+        </h2>
+        <div class="editorial-body max-w-2xl">
+          {{ page.closing_paragraph|richtext }}
+        </div>
+      </div>
+    </div>
+  </section>
+
+</article>
+{% endblock %}
