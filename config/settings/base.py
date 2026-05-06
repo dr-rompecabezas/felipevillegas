@@ -15,6 +15,7 @@ INSTALLED_APPS = [
     "work",
     "photography",
     "contact",
+    "interactive",
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
     "wagtail.embeds",
