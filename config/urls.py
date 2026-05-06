@@ -12,6 +12,9 @@ urlpatterns = [
     path("favicon.ico", core_views.favicon),
     path("admin/", include(wagtailadmin_urls)),
     path("documents/", include(wagtaildocs_urls)),
+    # Mounted at /api/ so it never collides with the Wagtail page tree
+    # (the InteractivePage itself lives at /interactive/).
+    path("api/", include("interactive.urls")),
     path("", include(wagtail_urls)),
 ]
 

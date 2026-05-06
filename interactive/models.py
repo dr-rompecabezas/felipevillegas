@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.validators import RegexValidator
 from django.db import models
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel
@@ -215,6 +216,14 @@ class InteractivePage(Page):
         help_text="System prompt sent to the AI chat. Wired up in Phase 3.",
     )
 
+    chat_starters = StreamField(
+        [("starter", CharBlock(max_length=160))],
+        blank=True,
+        max_num=6,
+        use_json_field=True,
+        help_text="Guided starter questions shown as chips above the chat input. 4–6 recommended.",
+    )
+
     content_panels = Page.content_panels + [
         MultiFieldPanel(
             [
@@ -245,6 +254,7 @@ class InteractivePage(Page):
             [
                 FieldPanel("chat_enabled"),
                 FieldPanel("chat_system_prompt"),
+                FieldPanel("chat_starters"),
             ],
             heading="AI chat (Phase 3)",
         ),
@@ -276,6 +286,8 @@ class InteractivePage(Page):
         context["timeline_nodes_ordered"] = self._order_blocks_by_audience(self.timeline_nodes, focus)
         context["translation_rows_ordered"] = self._order_blocks_by_audience(self.translation_rows, focus)
         context["reflection_option_echoes"] = self._build_reflection_echoes()
+        context["chat_output_budget"] = settings.CHAT_DAILY_OUTPUT_TOKEN_BUDGET
+        context["chat_max_chars"] = settings.CHAT_INPUT_MAX_CHARS
         return context
 
     def _build_reflection_echoes(self):

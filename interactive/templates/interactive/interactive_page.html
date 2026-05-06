@@ -438,18 +438,194 @@
     text-underline-offset: 3px;
   }
 
-  /* Chat placeholder */
-  .interactive-page .chat-placeholder {
-    border: 1px dashed #D4CFC5;
-    padding: 2rem;
-    text-align: center;
+  /* Chat panel */
+  .interactive-page .chat-panel {
+    background: white;
+    border: 1px solid #E8E4DC;
+    border-left: 2px solid var(--page-accent);
+    padding: 1.75rem;
+    max-width: 44rem;
+  }
+  .interactive-page .chat-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-size: 0.625rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
     color: #8A8880;
   }
-  .interactive-page .chat-placeholder .label {
-    font-size: 0.625rem;
-    letter-spacing: 0.2em;
+  .interactive-page .fuel-gauge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .interactive-page .fuel-track {
+    width: 80px;
+    height: 4px;
+    background: #E8E4DC;
+    position: relative;
+  }
+  .interactive-page .fuel-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    background-color: var(--page-accent);
+    transition: width 0.3s ease;
+  }
+  .interactive-page .chat-starters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  .interactive-page .chat-starter {
+    background: #FAF7F2;
+    border: 1px solid #D4CFC5;
+    padding: 0.5rem 0.875rem;
+    font-size: 0.875rem;
+    color: #3A3835;
+    font-family: inherit;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+  .interactive-page .chat-starter:hover {
+    border-color: var(--page-accent);
+    color: var(--page-accent);
+  }
+  .interactive-page .chat-starter:focus-visible {
+    outline: 2px solid var(--page-accent);
+    outline-offset: 2px;
+  }
+  .interactive-page .chat-starter[disabled] {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  .interactive-page .chat-form {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-end;
+  }
+  .interactive-page .chat-input {
+    flex: 1;
+    border: 1px solid #D4CFC5;
+    background: #FAF7F2;
+    padding: 0.625rem 0.75rem;
+    font: inherit;
+    font-size: 0.9375rem;
+    color: #1A1A18;
+    resize: vertical;
+    min-height: 2.5rem;
+    max-height: 10rem;
+  }
+  .interactive-page .chat-input:focus-visible {
+    outline: 2px solid var(--page-accent);
+    outline-offset: 1px;
+    border-color: var(--page-accent);
+  }
+  .interactive-page .chat-submit {
+    background-color: var(--page-accent);
+    color: #FAF7F2;
+    border: 0;
+    padding: 0.625rem 1rem;
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    margin-bottom: 0.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+  .interactive-page .chat-submit:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  .interactive-page .chat-exchange {
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid #E8E4DC;
+  }
+  .interactive-page .chat-q {
+    font-size: 0.875rem;
+    color: #5C5A54;
+    margin-bottom: 0.75rem;
+  }
+  .interactive-page .chat-q::before {
+    content: "You — ";
+    font-size: 0.625rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #8A8880;
+  }
+  .interactive-page .chat-a {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    color: #1A1A18;
+  }
+  .interactive-page .chat-a::before {
+    content: "Reply — ";
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 0.625rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--page-accent);
+    display: block;
+    margin-bottom: 0.375rem;
+  }
+  .interactive-page .chat-a p { margin: 0 0 0.75em; }
+  .interactive-page .chat-a p:last-child { margin-bottom: 0; }
+  .interactive-page .chat-a strong {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-style: normal;
+    font-weight: 500;
+    color: #1A1A18;
+  }
+  .interactive-page .chat-a em { font-style: italic; }
+  .interactive-page .chat-a code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.9em;
+    background: #F5EFE6;
+    padding: 0.05em 0.35em;
+    border-radius: 2px;
+  }
+  .interactive-page .chat-a ul,
+  .interactive-page .chat-a ol {
+    margin: 0.25em 0 0.75em 1.25em;
+    padding: 0;
+  }
+  .interactive-page .chat-a li { margin-bottom: 0.25em; }
+  .interactive-page .chat-a a {
+    color: var(--page-accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .interactive-page .chat-cta {
+    margin-top: 1rem;
+    padding: 1rem 1.25rem;
+    background: #F5EFE6;
+    border-left: 2px solid var(--page-accent);
+    font-size: 0.9375rem;
+    color: #3A3835;
+  }
+  .interactive-page .chat-cta a {
+    color: var(--page-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .interactive-page .chat-spinner {
+    display: inline-block;
+    width: 0.75rem;
+    height: 0.75rem;
+    border: 1.5px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: chat-spin 0.7s linear infinite;
+    vertical-align: -2px;
+    margin-right: 0.5rem;
+  }
+  @keyframes chat-spin {
+    to { transform: rotate(360deg); }
   }
 
   /* Closing */
@@ -713,9 +889,10 @@
     </section>
   {% endfor %}
 
-  {# 6 — Chat (Phase 3) — placeholder when chat_enabled is true ------------- #}
+  {# 6 — Chat (Phase 3) — single-turn AI conversation -------------------- #}
   {% if page.chat_enabled %}
-    <section class="py-20" aria-labelledby="chat-heading">
+    <section class="py-20" aria-labelledby="chat-heading"
+             x-data="interactiveChat({ budget: {{ chat_output_budget }}, maxChars: {{ chat_max_chars }} })">
       <div class="section-frame">
         <header class="mb-8 fade-up">
           <p class="section-label mb-4">Module Four</p>
@@ -723,16 +900,66 @@
             Ask me anything (within reason).
           </h2>
           <p class="mt-4 text-warm-600 max-w-2xl">
-            The chat is single-turn, scoped to questions about Felipe's work and
-            approach to learning technology. Coming online in the next iteration.
+            Single-turn conversation, scoped to Felipe's work and approach to
+            learning technology. Each question stands alone — there is no
+            memory between asks. Pick a starter or write your own.
           </p>
         </header>
-        <div class="chat-placeholder fade-up">
-          <p class="label">Coming soon</p>
-          <p class="font-display italic text-lg">Until then, reach out directly.</p>
-          <p class="mt-2 text-sm">
-            <a class="accent-text" href="mailto:f.villegas@thinkelearn.com">f.villegas@thinkelearn.com</a>
-          </p>
+
+        <div class="chat-panel fade-up">
+          <div class="chat-meta">
+            <span>Single-turn · Claude Haiku 4.5</span>
+            <span class="fuel-gauge" aria-label="Remaining session budget">
+              <span class="fuel-track" aria-hidden="true">
+                <span class="fuel-fill" :style="`width: ${fuelPercent()}%`"></span>
+              </span>
+              <span x-text="`${remaining} left`"></span>
+            </span>
+          </div>
+
+          {% if page.chat_starters|length %}
+            <div class="chat-starters" role="list">
+              {% for block in page.chat_starters %}
+                <button type="button"
+                        class="chat-starter"
+                        role="listitem"
+                        :disabled="loading || closed"
+                        @click="ask('{{ block.value|escapejs }}')">
+                  {{ block.value }}
+                </button>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <form class="chat-form" @submit.prevent="ask(userInput)">
+            <label class="sr-only" for="chat-input">Your question</label>
+            <textarea id="chat-input"
+                      class="chat-input"
+                      rows="1"
+                      :maxlength="maxChars"
+                      placeholder="Type a question…"
+                      x-model="userInput"
+                      :disabled="loading || closed"
+                      @keydown.enter.prevent="ask(userInput)"></textarea>
+            <button type="submit"
+                    class="chat-submit"
+                    :disabled="loading || closed || !userInput.trim()">
+              <template x-if="loading"><span class="chat-spinner" aria-hidden="true"></span></template>
+              <span x-text="loading ? 'Thinking' : 'Send'"></span>
+            </button>
+          </form>
+
+          <div x-show="lastQuestion || lastReplyHtml" x-cloak class="chat-exchange" aria-live="polite">
+            <p class="chat-q" x-text="lastQuestion" x-show="lastQuestion"></p>
+            <div class="chat-a" x-html="lastReplyHtml" x-show="lastReplyHtml"></div>
+          </div>
+
+          <div x-show="ctaMessage" x-cloak class="chat-cta" role="status">
+            <span x-text="ctaMessage"></span>
+            Email
+            <a href="mailto:f.villegas@thinkelearn.com">f.villegas@thinkelearn.com</a>
+            to keep the conversation going.
+          </div>
         </div>
       </div>
     </section>
@@ -763,6 +990,116 @@
 
 {% block extra_js %}
 <script>
+  function getCsrfToken() {
+    const match = document.cookie.match(/(?:^|; )csrftoken=([^;]+)/);
+    return match ? decodeURIComponent(match[1]) : '';
+  }
+
+  // Tiny markdown renderer for chat replies. Escapes HTML first, then
+  // converts a small allowlist of inline markers and block structures.
+  // Anything not listed here is rendered as plain text.
+  function renderChatMarkdown(src) {
+    if (!src) return '';
+    const escape = (s) => s
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+    const inline = (s) => s
+      // Bold: **text** or __text__
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/__(.+?)__/g, '<strong>$1</strong>')
+      // Italic: *text* or _text_ (avoid eating ** or __ already handled)
+      .replace(/(^|[^\*])\*([^\*\n]+?)\*(?!\*)/g, '$1<em>$2</em>')
+      .replace(/(^|[^_])_([^_\n]+?)_(?!_)/g, '$1<em>$2</em>')
+      // Inline code: `text`
+      .replace(/`([^`\n]+?)`/g, '<code>$1</code>')
+      // Links: [text](https://…) — http/https/mailto only
+      .replace(
+        /\[([^\]]+)\]\((https?:\/\/[^\s)]+|mailto:[^\s)]+)\)/g,
+        '<a href="$2" target="_blank" rel="noopener">$1</a>'
+      );
+
+    const blocks = escape(src).split(/\n{2,}/);
+    return blocks
+      .map((block) => {
+        const lines = block.split('\n');
+        const isUl = lines.every((l) => /^\s*[-*]\s+/.test(l));
+        const isOl = lines.every((l) => /^\s*\d+\.\s+/.test(l));
+        if (isUl) {
+          return '<ul>' + lines.map((l) => '<li>' + inline(l.replace(/^\s*[-*]\s+/, '')) + '</li>').join('') + '</ul>';
+        }
+        if (isOl) {
+          return '<ol>' + lines.map((l) => '<li>' + inline(l.replace(/^\s*\d+\.\s+/, '')) + '</li>').join('') + '</ol>';
+        }
+        return '<p>' + inline(block).replace(/\n/g, '<br>') + '</p>';
+      })
+      .join('');
+  }
+
+  function interactiveChat({ budget, maxChars }) {
+    return {
+      budget: budget,
+      remaining: budget,
+      maxChars: maxChars,
+      userInput: '',
+      lastQuestion: '',
+      lastReply: '',
+      lastReplyHtml: '',
+      loading: false,
+      closed: false,
+      ctaMessage: '',
+      fuelPercent() {
+        if (!this.budget) return 0;
+        return Math.max(0, Math.min(100, (this.remaining / this.budget) * 100));
+      },
+      async ask(text) {
+        const message = (text || '').trim();
+        if (!message || this.loading || this.closed) return;
+        if (message.length > this.maxChars) {
+          this.ctaMessage = `Messages are capped at ${this.maxChars} characters.`;
+          return;
+        }
+        this.loading = true;
+        this.lastQuestion = message;
+        this.lastReply = '';
+        this.lastReplyHtml = '';
+        this.ctaMessage = '';
+        try {
+          const response = await fetch('{% url "interactive:chat" %}', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': getCsrfToken(),
+            },
+            body: JSON.stringify({ message }),
+          });
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            this.ctaMessage = data.message || 'The chat is unavailable right now.';
+            if (response.status === 429 || response.status === 502 || response.status === 503) {
+              this.closed = true;
+            }
+            return;
+          }
+          this.lastReply = data.reply || '';
+          this.lastReplyHtml = renderChatMarkdown(this.lastReply);
+          if (typeof data.output_tokens === 'number') {
+            this.remaining = Math.max(0, this.remaining - data.output_tokens);
+            if (this.remaining === 0) {
+              this.closed = true;
+              this.ctaMessage = 'Session budget reached.';
+            }
+          }
+          this.userInput = '';
+        } catch (err) {
+          this.ctaMessage = 'Network error — could not reach the chat service.';
+        } finally {
+          this.loading = false;
+        }
+      },
+    };
+  }
+
   function interactivePage() {
     return {
       reflectionChoice: null,

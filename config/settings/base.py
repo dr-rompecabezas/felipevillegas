@@ -104,3 +104,15 @@ WAGTAILADMIN_BASE_URL = config("WAGTAILADMIN_BASE_URL", default="http://localhos
 WAGTAILIMAGES_IMAGE_MODEL = "wagtailimages.Image"
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+# ── Interactive page chat (Anthropic) ─────────────────────────────────
+# All limits read from env so production can tune without a code deploy.
+# The Anthropic console hard monthly cap is the last line of defence and
+# must be set manually — see README.
+ANTHROPIC_API_KEY = config("ANTHROPIC_API_KEY", default="")
+ANTHROPIC_MODEL = config("ANTHROPIC_MODEL", default="claude-haiku-4-5-20251001")
+CHAT_DAILY_INPUT_TOKEN_BUDGET = config("CHAT_DAILY_INPUT_TOKEN_BUDGET", default=5000, cast=int)
+CHAT_DAILY_OUTPUT_TOKEN_BUDGET = config("CHAT_DAILY_OUTPUT_TOKEN_BUDGET", default=2000, cast=int)
+CHAT_RPM = config("CHAT_RPM", default=6, cast=int)
+CHAT_INPUT_MAX_CHARS = config("CHAT_INPUT_MAX_CHARS", default=1000, cast=int)
+CHAT_MAX_OUTPUT_TOKENS = config("CHAT_MAX_OUTPUT_TOKENS", default=400, cast=int)

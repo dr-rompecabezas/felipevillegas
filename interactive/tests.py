@@ -1,6 +1,12 @@
+import json
+from types import SimpleNamespace
+from unittest.mock import patch
+
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
-from django.test import TestCase
+from django.test import Client, TestCase, override_settings
+from django.urls import reverse
 from wagtail.models import Page, Site
 
 from contact.models import ContactPage
@@ -497,3 +503,153 @@ class ReflectionEchoTests(InteractivePageTestCase):
         # Old broken behaviour must be gone.
         self.assertNotIn("is-reflection-match", body)
         self.assertNotIn("isReflectionMatch", body)
+
+
+def _fake_anthropic_response(reply: str = "Hello.", input_tokens: int = 50, output_tokens: int = 25):
+    """Build a minimal duck-typed Anthropic Messages response."""
+    return SimpleNamespace(
+        content=[SimpleNamespace(text=reply, type="text")],
+        usage=SimpleNamespace(input_tokens=input_tokens, output_tokens=output_tokens),
+    )
+
+
+@override_settings(
+    ANTHROPIC_API_KEY="test-key",
+    CHAT_DAILY_INPUT_TOKEN_BUDGET=200,
+    CHAT_DAILY_OUTPUT_TOKEN_BUDGET=100,
+    CHAT_RPM=3,
+    CHAT_INPUT_MAX_CHARS=120,
+    CHAT_MAX_OUTPUT_TOKENS=50,
+)
+class ChatViewTests(InteractivePageTestCase):
+    """Tests for the /api/interactive/chat/ proxy view."""
+
+    def setUp(self):
+        super().setUp()
+        # CSRF cookie is needed for the enforce_csrf_checks=True client.
+        self.client = Client(enforce_csrf_checks=True)
+        self.page = InteractivePage(
+            title="Interactive",
+            slug="interactive",
+            live=True,
+            chat_enabled=True,
+            chat_system_prompt="You are a test assistant.",
+        )
+        self.home.add_child(instance=self.page)
+        cache.clear()
+
+    def _post(self, payload, *, with_csrf: bool = True, ip: str = "10.0.0.1"):
+        url = reverse("interactive:chat")
+        headers = {"REMOTE_ADDR": ip, "content_type": "application/json"}
+        if with_csrf:
+            from django.middleware.csrf import get_token
+
+            request = self.client.get("/interactive/", REMOTE_ADDR=ip).wsgi_request
+            token = get_token(request)
+            self.client.cookies["csrftoken"] = token
+            headers["HTTP_X_CSRFTOKEN"] = token
+        return self.client.post(url, data=json.dumps(payload), **headers)
+
+    def test_csrf_rejects_request_without_token(self):
+        url = reverse("interactive:chat")
+        response = self.client.post(
+            url,
+            data=json.dumps({"message": "Hi"}),
+            content_type="application/json",
+            REMOTE_ADDR="10.0.0.99",
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_input_length_cap_rejects_oversized_message(self):
+        long_msg = "x" * 121  # CHAT_INPUT_MAX_CHARS = 120
+        with patch("interactive.views.anthropic.Anthropic") as client_cls:
+            response = self._post({"message": long_msg})
+        self.assertEqual(response.status_code, 413)
+        body = response.json()
+        self.assertEqual(body["error"], "input_too_long")
+        self.assertEqual(body["limit"], 120)
+        client_cls.assert_not_called()
+
+    def test_json_response_shape_on_success(self):
+        with patch("interactive.views.anthropic.Anthropic") as client_cls:
+            client_cls.return_value.messages.create.return_value = _fake_anthropic_response(
+                reply="The architecture transfers.",
+                input_tokens=42,
+                output_tokens=17,
+            )
+            response = self._post({"message": "Tell me about Felipe."})
+        self.assertEqual(response.status_code, 200)
+        body = response.json()
+        self.assertEqual(set(body), {"reply", "input_tokens", "output_tokens"})
+        self.assertEqual(body["reply"], "The architecture transfers.")
+        self.assertEqual(body["input_tokens"], 42)
+        self.assertEqual(body["output_tokens"], 17)
+
+    def test_rpm_throttle_returns_documented_shape(self):
+        with patch("interactive.views.anthropic.Anthropic") as client_cls:
+            client_cls.return_value.messages.create.return_value = _fake_anthropic_response()
+            for _ in range(3):  # CHAT_RPM = 3
+                ok = self._post({"message": "Hi"})
+                self.assertEqual(ok.status_code, 200)
+            blocked = self._post({"message": "Hi"})
+        self.assertEqual(blocked.status_code, 429)
+        body = blocked.json()
+        self.assertEqual(body["error"], "rate_limited")
+        self.assertIn("retry_after", body)
+
+    def test_daily_budget_exhaustion_returns_documented_shape(self):
+        # Output budget is 100 tokens; one call burns 60 → second call still
+        # allowed; second burns 60 → cumulative 120 > 100, third call blocked.
+        with patch("interactive.views.anthropic.Anthropic") as client_cls:
+            client_cls.return_value.messages.create.return_value = _fake_anthropic_response(
+                output_tokens=60, input_tokens=10
+            )
+            r1 = self._post({"message": "one"})
+            r2 = self._post({"message": "two"})
+            blocked = self._post({"message": "three"})
+        self.assertEqual(r1.status_code, 200)
+        self.assertEqual(r2.status_code, 200)
+        self.assertEqual(blocked.status_code, 429)
+        body = blocked.json()
+        self.assertEqual(body["error"], "budget_exhausted")
+        self.assertIn("contact_email", body)
+
+    def test_chat_disabled_when_flag_off(self):
+        self.page.chat_enabled = False
+        self.page.save_revision().publish()
+        with patch("interactive.views.anthropic.Anthropic") as client_cls:
+            response = self._post({"message": "Hi"})
+        self.assertEqual(response.status_code, 404)
+        client_cls.assert_not_called()
+
+    def test_chat_disabled_hides_panel_in_html(self):
+        self.page.chat_enabled = False
+        self.page.save_revision().publish()
+        response = self.client.get("/interactive/")
+        self.assertEqual(response.status_code, 200)
+        body = response.content.decode("utf-8")
+        # The chat module heading and the form markup must be absent.
+        self.assertNotIn("Module Four", body)
+        self.assertNotIn('class="chat-form"', body)
+        # Alpine wiring is also gated — the section's x-data attr must be absent.
+        self.assertNotIn('x-data="interactiveChat(', body)
+
+    def test_chat_panel_renders_when_enabled(self):
+        response = self.client.get("/interactive/")
+        body = response.content.decode("utf-8")
+        self.assertIn("Module Four", body)
+        self.assertIn('class="chat-form"', body)
+        self.assertIn("Single-turn", body)
+        # Form posts to the chat endpoint
+        self.assertIn(reverse("interactive:chat"), body)
+
+
+@override_settings(ANTHROPIC_API_KEY="test-key")
+class ChatStartersTests(InteractivePageTestCase):
+    def test_starters_render_when_seeded(self):
+        call_command("populate_interactive_page")
+        response = self.client.get("/interactive/")
+        body = response.content.decode("utf-8")
+        # At least one of the seeded starter questions should appear as a chip.
+        self.assertIn('class="chat-starter"', body)
+        self.assertIn("How does QlubPro", body)

@@ -105,14 +105,13 @@ TIMELINE_NODES = [
     },
     {
         "year": "2024",
-        "label": "Building with AI",
+        "label": "Building with AI (the editor era)",
         "body": (
-            "<p>The year AI-assisted development became daily practice. Claude Code, "
-            "Codex, and Copilot in the editor loop alongside the work itself. The point "
-            "isn't the tools; it's the engineering discipline of using them well. "
-            "Reading every diff. Writing the tests first. Treating the model like a fast "
-            "junior engineer whose output needs review, not a black box that emits "
-            "answers.</p>"
+            "<p>The year AI-assisted development moved into daily practice — but at this "
+            "point it meant Copilot in the editor and ChatGPT in another tab. The PDC "
+            "Portal was the proving ground: 866 tests at 94% coverage, written alongside "
+            "the code with the model as a fast junior engineer whose output needed "
+            "review. The discipline came first; the better tooling came later.</p>"
         ),
         "audience_tags": ["generic", "learning_engineer"],
     },
@@ -131,6 +130,11 @@ TIMELINE_NODES = [
             "1M-record PostGIS bulk-load), <em>VisionVitals</em>, and <em>CropCycle</em>. "
             "And the IBM RAG &amp; Agentic AI Professional Certificate, eight Coursera "
             "courses, completed Sep–Oct.</p>"
+            "<p>The toolchain shifted with the work. Claude Code went from "
+            "API-billed-and-rationed to nearly daily once the subscription tier landed; "
+            "Codex CLI joined the rotation and the chat-window tools dropped out of the "
+            "coding loop. Today the split is Claude Code primarily, Codex for "
+            "second-opinion reviews, and Copilot for PR review on GitHub.</p>"
         ),
         "audience_tags": ["generic", "learning_engineer", "lms_architect"],
     },
@@ -336,6 +340,18 @@ Style:
 
 
 # ---------------------------------------------------------------------------
+# Chat starters — guided questions shown as chips above the chat input
+# ---------------------------------------------------------------------------
+CHAT_STARTERS = [
+    "What does Felipe mean by 'learning designer who builds the platform'?",
+    "How does QlubPro's architecture transfer to a learning platform?",
+    "What's Felipe's approach to using AI in learning design?",
+    "Which of Felipe's projects best shows full-stack engineering?",
+    "What kind of role is Felipe looking for next?",
+]
+
+
+# ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 def _stream(block_type: str, items: list) -> str:
@@ -352,6 +368,7 @@ def _build_field_payload() -> dict:
         "reflection": _stream("reflection", [REFLECTION]),
         "closing_paragraph": CLOSING_HTML,
         "chat_system_prompt": CHAT_SYSTEM_PROMPT,
+        "chat_starters": _stream("starter", CHAT_STARTERS),
     }
 
 
