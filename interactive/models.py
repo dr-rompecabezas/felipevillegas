@@ -1,3 +1,4 @@
+from django.core.validators import RegexValidator
 from django.db import models
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel
 from wagtail.blocks import (
@@ -99,12 +100,12 @@ class InteractivePage(Page):
     target_company = models.CharField(
         max_length=120,
         blank=True,
-        help_text="Optional employer name. Used in closing paragraph and the optional employer section.",
+        help_text="Optional employer name. Rendered in the closing employer line only when 'Show employer section' is enabled.",
     )
     target_role = models.CharField(
         max_length=200,
         blank=True,
-        help_text="Optional role title. Used in closing paragraph.",
+        help_text="Optional role title. Rendered in the closing employer line only when 'Show employer section' is enabled.",
     )
     audience_focus = models.CharField(
         max_length=40,
@@ -115,7 +116,13 @@ class InteractivePage(Page):
     accent_color = models.CharField(
         max_length=7,
         default="#1A3A5C",
-        help_text="Hex colour driving the page's accent (e.g. #1A3A5C for Geotab).",
+        validators=[
+            RegexValidator(
+                regex=r"^#[0-9A-Fa-f]{6}$",
+                message="Enter a 6-digit hex colour with leading '#', e.g. #1A3A5C.",
+            )
+        ],
+        help_text="Six-digit hex colour driving the page's accent (e.g. #1A3A5C for Geotab). Injected into an inline style block — must be a valid hex value.",
     )
     show_employer_section = models.BooleanField(
         default=False,

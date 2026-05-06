@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.test import TestCase
 from wagtail.models import Page, Site
@@ -84,6 +85,19 @@ class InteractivePageModelTests(InteractivePageTestCase):
         self.assertEqual(page.accent_color, "#1A3A5C")
         self.assertFalse(page.show_employer_section)
         self.assertTrue(page.chat_enabled)
+
+    def test_accent_color_rejects_invalid_hex(self):
+        # Validate the field's validators directly — sidesteps treebeard's path/depth
+        # requirements that come with full_clean()/clean_fields() on a Page subclass.
+        field = InteractivePage._meta.get_field("accent_color")
+        with self.assertRaises(ValidationError):
+            for validator in field.validators:
+                validator("not-hx")
+
+    def test_accent_color_accepts_valid_hex(self):
+        field = InteractivePage._meta.get_field("accent_color")
+        for validator in field.validators:
+            validator("#C4622D")  # should not raise
 
 
 class PopulateInteractivePageCommandTests(InteractivePageTestCase):
