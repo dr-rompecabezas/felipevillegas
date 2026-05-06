@@ -64,6 +64,35 @@ See `.env.example` for the full list. Production-only variables (S3) can be left
 | `DATABASE_URL` | Production | Defaults to SQLite in dev |
 | `AWS_*` | Production | S3 media storage |
 | `WAGTAILADMIN_BASE_URL` | Production | Used in Wagtail email links |
+| `ANTHROPIC_API_KEY` | Chat enabled | Without it, the chat view returns 503 |
+| `ANTHROPIC_MODEL` | Optional | Defaults to `claude-haiku-4-5-20251001` |
+| `CHAT_DAILY_INPUT_TOKEN_BUDGET` | Optional | Per-IP daily input cap (default: 5000) |
+| `CHAT_DAILY_OUTPUT_TOKEN_BUDGET` | Optional | Per-IP daily output cap (default: 2000) |
+| `CHAT_RPM` | Optional | Per-IP requests per minute (default: 6) |
+| `CHAT_INPUT_MAX_CHARS` | Optional | Hard cap on user message length (default: 1000) |
+| `CHAT_MAX_OUTPUT_TOKENS` | Optional | `max_tokens` passed to Anthropic (default: 400) |
+
+### Interactive page chat (Anthropic)
+
+The `/interactive/` page hosts a single-turn chat backed by Claude Haiku 4.5. The system prompt is editable in the Wagtail admin (`InteractivePage → AI chat`), and the page has a `chat_enabled` toggle.
+
+Cost and abuse controls are layered, all keyed by client IP:
+
+1. Hard input length cap (`CHAT_INPUT_MAX_CHARS`).
+2. Per-IP requests-per-minute (`CHAT_RPM`).
+3. Per-IP daily input + output token budgets (`CHAT_DAILY_INPUT_TOKEN_BUDGET`, `CHAT_DAILY_OUTPUT_TOKEN_BUDGET`).
+
+These are the first line of defence; **set a hard monthly spend cap in the Anthropic console** ($10 is a sensible starting point) as the last line. The in-app caps are not enforceable below the API surface, so the console cap is the only thing that bounds total spend if a worker dies mid-request, the cache is wiped, or budget settings are misconfigured.
+
+Local dev:
+
+```bash
+# In .env
+ANTHROPIC_API_KEY=sk-ant-...
+
+uv run python manage.py runserver
+# Visit /interactive/ and pick a starter chip or type a question.
+```
 
 For media-performance tuning in production:
 

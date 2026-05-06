@@ -14,6 +14,7 @@ dependencies = [
     "wagtail>=7.3",
     "whitenoise[brotli]>=6.12.0",
     "sentry-sdk[django]>=2.0",
+    "anthropic>=0.100.0",
 ]
 
 [tool.uv]
