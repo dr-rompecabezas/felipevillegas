@@ -1,13 +1,24 @@
 """AI chat proxy for the InteractivePage.
 
 The chat is single-turn by design: the client posts one user message, the view
-forwards it to Anthropic with the page's `chat_system_prompt`, and returns the
-reply. There is no conversation history stored or replayed.
+forwards it to Anthropic with a two-part system prompt and returns the reply.
+There is no conversation history stored or replayed.
+
+System prompt assembly:
+    - The page's `chat_system_prompt` (Wagtail-editable) supplies style and
+      scope rules — how the bot talks, what's out of bounds.
+    - `interactive/data/profile.md` (version-controlled) supplies the factual
+      source of truth about Felipe — career, projects, skills, scope notes.
+    - The two are concatenated and sent as a single cache-marked system block
+      so Anthropic can serve them from the prompt cache on subsequent calls.
 
 Cost and abuse controls are layered, all keyed by client IP:
     1. Hard input length cap (cheap rejection before any model call).
     2. Per-IP requests-per-minute throttle (atomic per-minute bucket).
-    3. Per-IP daily input + output token budgets (atomic counters).
+    3. Per-IP daily input + output token budgets (atomic counters). With
+       prompt caching enabled, `usage.input_tokens` excludes cache reads,
+       so the input budget effectively measures the user's message portion
+       and not the (cached) system prompt.
     4. `max_tokens` clamped to remaining output budget so a single response
        cannot overshoot the daily cap.
 
@@ -18,6 +29,7 @@ import json
 import logging
 import time
 from datetime import timedelta
+from pathlib import Path
 
 import anthropic
 from django.conf import settings
@@ -29,6 +41,30 @@ from django.views.decorators.http import require_POST
 from interactive.models import InteractivePage
 
 logger = logging.getLogger(__name__)
+
+PROFILE_PATH = Path(__file__).resolve().parent / "data" / "profile.md"
+
+
+def _load_profile_text() -> str:
+    """Read profile.md once at import time. Missing file is non-fatal —
+    the chat falls back to just the editable system prompt."""
+    try:
+        return PROFILE_PATH.read_text(encoding="utf-8").strip()
+    except OSError:
+        logger.warning("profile.md not found at %s — chat will run without it.", PROFILE_PATH)
+        return ""
+
+
+_PROFILE_TEXT = _load_profile_text()
+
+
+def _build_system_prompt(page_prompt: str) -> str:
+    """Combine the editable page prompt (style/scope frame) with the
+    version-controlled profile (factual context). Page prompt comes first
+    so its style and scope rules anchor the model before it sees the facts.
+    """
+    parts = [p.strip() for p in (page_prompt, _PROFILE_TEXT) if p and p.strip()]
+    return "\n\n---\n\n".join(parts)
 
 
 def _client_ip(request: HttpRequest) -> str:
@@ -144,7 +180,22 @@ def chat(request: HttpRequest) -> JsonResponse:
             contact_email="f.villegas@thinkelearn.com",
         )
 
-    system_prompt = page.chat_system_prompt or ""
+    system_prompt = _build_system_prompt(page.chat_system_prompt or "")
+    # Mark the combined system prompt as cacheable. The prompt is identical
+    # on every call (page prompt rarely changes; profile.md is loaded once),
+    # so Anthropic serves it from cache after the first request and only
+    # bills the user message portion on subsequent calls.
+    system_blocks = (
+        [
+            {
+                "type": "text",
+                "text": system_prompt,
+                "cache_control": {"type": "ephemeral"},
+            }
+        ]
+        if system_prompt
+        else []
+    )
     client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
 
     # Cap max_tokens to what's left of today's output budget so a single
@@ -155,7 +206,7 @@ def chat(request: HttpRequest) -> JsonResponse:
         response = client.messages.create(
             model=settings.ANTHROPIC_MODEL,
             max_tokens=max_tokens,
-            system=system_prompt,
+            system=system_blocks,
             messages=[{"role": "user", "content": user_message}],
         )
     except anthropic.APIError as exc:

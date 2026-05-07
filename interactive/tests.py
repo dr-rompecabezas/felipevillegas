@@ -326,21 +326,15 @@ class RoleAdaptationTests(InteractivePageTestCase):
         self.assertIn('<p class="role-kicker', body)
         self.assertIn("Program Experience Designer", body)
 
-    def test_timeline_ordering_puts_matching_nodes_first(self):
-        response = self.client.get("/interactive/?role=learning-engineer")
-        ordered = response.context["timeline_nodes_ordered"]
-
-        # Every node tagged with learning_engineer must precede the first untagged one.
-        seen_unmatched = False
-        for block in ordered:
-            tags = block.value.get("audience_tags") or []
-            if "learning_engineer" in tags:
-                self.assertFalse(
-                    seen_unmatched,
-                    "A learning_engineer-tagged node appeared after an untagged node — ordering broken.",
-                )
-            else:
-                seen_unmatched = True
+    def test_timeline_preserves_chronological_order_across_roles(self):
+        # Timelines are chronological narratives; reordering by audience tag
+        # breaks the arc. Authored order must be preserved regardless of role.
+        authored_years = [b.value["year"] for b in InteractivePage.objects.first().timeline_nodes]
+        for slug in ["learning-engineer", "lms-architect", "program-designer", "technical-id"]:
+            with self.subTest(role=slug):
+                response = self.client.get(f"/interactive/?role={slug}")
+                rendered_years = [b.value["year"] for b in response.context["timeline_nodes_ordered"]]
+                self.assertEqual(rendered_years, authored_years)
 
     def test_translation_ordering_puts_matching_rows_first(self):
         response = self.client.get("/interactive/?role=lms-architect")
@@ -378,7 +372,7 @@ class RoleAdaptationTests(InteractivePageTestCase):
 
 class TranslationRowBackfillTests(InteractivePageTestCase):
     """Validate the data-migration logic that backfills audience_tags on
-    translation rows for pages created before Phase 2.
+    translation rows that pre-date the audience_tags field.
 
     The migration itself runs once at deploy time, so we can't easily replay
     it inside a test transaction. Instead we exercise the migration's pure
@@ -585,6 +579,28 @@ class ChatViewTests(InteractivePageTestCase):
         self.assertEqual(body["reply"], "The architecture transfers.")
         self.assertEqual(body["input_tokens"], 42)
         self.assertEqual(body["output_tokens"], 17)
+
+    def test_system_prompt_combines_page_and_profile_with_cache_control(self):
+        # Anthropic gets a single cache-marked system block whose text contains
+        # both the editable page prompt (style/scope) and the version-controlled
+        # profile (facts). Caching is what makes the long profile affordable —
+        # this test pins that the cache_control marker is set.
+        from interactive.views import _PROFILE_TEXT  # noqa: PLC0415
+
+        self.assertTrue(_PROFILE_TEXT, "profile.md must load at import time")
+        with patch("interactive.views.anthropic.Anthropic") as client_cls:
+            client_cls.return_value.messages.create.return_value = _fake_anthropic_response()
+            self._post({"message": "Hi"})
+        call_kwargs = client_cls.return_value.messages.create.call_args.kwargs
+        system = call_kwargs["system"]
+        self.assertIsInstance(system, list)
+        self.assertEqual(len(system), 1)
+        block = system[0]
+        self.assertEqual(block["type"], "text")
+        self.assertEqual(block["cache_control"], {"type": "ephemeral"})
+        self.assertIn("test assistant", block["text"])  # page prompt portion
+        # Profile sentinel: a stable phrase from interactive/data/profile.md.
+        self.assertIn("Felipe Villegas", block["text"])
 
     def test_rpm_throttle_returns_documented_shape(self):
         with patch("interactive.views.anthropic.Anthropic") as client_cls:
