@@ -889,7 +889,7 @@
     </section>
   {% endfor %}
 
-  {# 6 — Chat (Phase 3) — single-turn AI conversation -------------------- #}
+  {# 6 — Chat — single-turn AI conversation -------------------- #}
   {% if page.chat_enabled %}
     <section class="py-20" aria-labelledby="chat-heading"
              x-data="interactiveChat({ budget: {{ chat_output_budget }}, maxChars: {{ chat_max_chars }} })">
@@ -908,7 +908,7 @@
 
         <div class="chat-panel fade-up">
           <div class="chat-meta">
-            <span>Single-turn · Claude Haiku 4.5</span>
+            <span>Single-turn</span>
             <span class="fuel-gauge" aria-label="Remaining session budget">
               <span class="fuel-track" aria-hidden="true">
                 <span class="fuel-fill" :style="`width: ${fuelPercent()}%`"></span>

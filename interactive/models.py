@@ -69,7 +69,7 @@ class TimelineNodeBlock(StructBlock):
     audience_tags = ListBlock(
         ChoiceBlock(choices=AUDIENCE_FOCUS_CHOICES),
         required=False,
-        help_text="Audience archetypes for which this node is most relevant. Used by the ?role= adaptation in Phase 2.",
+        help_text="Audience archetypes for which this node is most relevant. Drives the ?role= emphasis on render.",
     )
 
     class Meta:
@@ -131,9 +131,8 @@ class ReflectionBlock(StructBlock):
 class InteractivePage(Page):
     """A single, reusable interactive portfolio page.
 
-    Phase 1 ships the schema and a static template. Phase 2 adds Alpine-driven
-    interactivity and ?role= adaptation. Phase 3 wires up the AI chat using the
-    chat_system_prompt field.
+    Editorial layout that adapts to ?role=, an Alpine-driven timeline and
+    translation matrix, and a single-turn AI chat scoped by chat_system_prompt.
     """
 
     max_count = 1
@@ -171,7 +170,7 @@ class InteractivePage(Page):
     )
     chat_enabled = models.BooleanField(
         default=True,
-        help_text="Wired up in Phase 3. Disable to hide the chat without removing data.",
+        help_text="Disable to hide the chat without removing data.",
     )
 
     hero_kicker = models.CharField(
@@ -213,7 +212,7 @@ class InteractivePage(Page):
 
     chat_system_prompt = models.TextField(
         blank=True,
-        help_text="System prompt sent to the AI chat. Wired up in Phase 3.",
+        help_text="System prompt sent to the AI chat.",
     )
 
     chat_starters = StreamField(
@@ -256,7 +255,7 @@ class InteractivePage(Page):
                 FieldPanel("chat_system_prompt"),
                 FieldPanel("chat_starters"),
             ],
-            heading="AI chat (Phase 3)",
+            heading="AI chat",
         ),
     ]
 
@@ -283,7 +282,11 @@ class InteractivePage(Page):
         # role. `generic` is recognised but treated as 'no preference' so a
         # visitor opting into generic doesn't see every block dimmed.
         context["audience_emphasis_active"] = role_explicit and focus != "generic"
-        context["timeline_nodes_ordered"] = self._order_blocks_by_audience(self.timeline_nodes, focus)
+        # Timeline stays in authored (chronological) order regardless of role —
+        # reordering a timeline by audience tag breaks the narrative arc. Visual
+        # emphasis for matching nodes is handled by the `is-match` class in the
+        # template, driven by `audience_emphasis_active`.
+        context["timeline_nodes_ordered"] = list(self.timeline_nodes)
         context["translation_rows_ordered"] = self._order_blocks_by_audience(self.translation_rows, focus)
         context["reflection_option_echoes"] = self._build_reflection_echoes()
         context["chat_output_budget"] = settings.CHAT_DAILY_OUTPUT_TOKEN_BUDGET
