@@ -219,9 +219,18 @@ def chat(request: HttpRequest) -> JsonResponse:
         )
 
     reply = "".join(getattr(block, "text", "") for block in response.content).strip()
-    input_tokens = response.usage.input_tokens
-    output_tokens = response.usage.output_tokens
-    _record_usage(ip, input_tokens, output_tokens)
+    usage = response.usage
+    input_tokens = usage.input_tokens
+    output_tokens = usage.output_tokens
+    # Cache writes are billable input tokens that Anthropic reports
+    # separately (`cache_creation_input_tokens`) — they do NOT appear in
+    # `input_tokens`. Counting them against the daily budget closes a
+    # bypass where a visitor spaces requests past the 5-minute cache TTL
+    # to force fresh cache creations and burn the system prompt's worth
+    # of input tokens for free. Cache reads are 10x cheaper and excluded
+    # here so the cache discount still flows to the user.
+    cache_creation = getattr(usage, "cache_creation_input_tokens", 0) or 0
+    _record_usage(ip, input_tokens + cache_creation, output_tokens)
 
     return JsonResponse(
         {

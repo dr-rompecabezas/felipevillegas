@@ -499,11 +499,28 @@ class ReflectionEchoTests(InteractivePageTestCase):
         self.assertNotIn("isReflectionMatch", body)
 
 
-def _fake_anthropic_response(reply: str = "Hello.", input_tokens: int = 50, output_tokens: int = 25):
-    """Build a minimal duck-typed Anthropic Messages response."""
+def _fake_anthropic_response(
+    reply: str = "Hello.",
+    input_tokens: int = 50,
+    output_tokens: int = 25,
+    cache_creation_input_tokens: int = 0,
+    cache_read_input_tokens: int = 0,
+):
+    """Build a minimal duck-typed Anthropic Messages response.
+
+    With prompt caching enabled, Anthropic reports cache writes in
+    `cache_creation_input_tokens` and cache reads in
+    `cache_read_input_tokens` rather than rolling them into `input_tokens`.
+    The fixture mirrors that shape so tests can exercise the budget logic.
+    """
     return SimpleNamespace(
         content=[SimpleNamespace(text=reply, type="text")],
-        usage=SimpleNamespace(input_tokens=input_tokens, output_tokens=output_tokens),
+        usage=SimpleNamespace(
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+            cache_creation_input_tokens=cache_creation_input_tokens,
+            cache_read_input_tokens=cache_read_input_tokens,
+        ),
     )
 
 
@@ -579,6 +596,32 @@ class ChatViewTests(InteractivePageTestCase):
         self.assertEqual(body["reply"], "The architecture transfers.")
         self.assertEqual(body["input_tokens"], 42)
         self.assertEqual(body["output_tokens"], 17)
+
+    def test_cache_creation_tokens_count_against_input_budget(self):
+        # With cache_control on the system block, Anthropic reports cache
+        # writes in `cache_creation_input_tokens`, not `input_tokens`. If we
+        # only counted `input_tokens` against the budget, a visitor could
+        # space requests past the 5-minute cache TTL to force fresh cache
+        # creations and burn ~7K tokens of system prompt for free per turn.
+        # Two requests, each forcing a cache write of 60 tokens, must
+        # together exhaust the 100-token output budget AND eat into the
+        # 200-token input budget by 120 + 2*10 = 140.
+        with patch("interactive.views.anthropic.Anthropic") as client_cls:
+            client_cls.return_value.messages.create.return_value = _fake_anthropic_response(
+                input_tokens=10,
+                output_tokens=10,
+                cache_creation_input_tokens=60,
+            )
+            r1 = self._post({"message": "one"})
+            r2 = self._post({"message": "two"})
+        self.assertEqual(r1.status_code, 200)
+        self.assertEqual(r2.status_code, 200)
+
+        # Probe the cache directly — 2 requests * (10 input + 60 cache_creation) = 140.
+        from interactive.views import _today_key  # noqa: PLC0415
+
+        used_in = cache.get(f"chat:in:10.0.0.1:{_today_key()}")
+        self.assertEqual(used_in, 140)
 
     def test_system_prompt_combines_page_and_profile_with_cache_control(self):
         # Anthropic gets a single cache-marked system block whose text contains
