@@ -105,7 +105,7 @@ TIMELINE_NODES = [
     },
     {
         "year": "2024",
-        "label": "Building with AI (the editor era)",
+        "label": "Building with AI",
         "body": (
             "<p>The year AI-assisted development moved into daily practice — but at this "
             "point it meant Copilot completing lines in the editor and ChatGPT in another "
@@ -122,11 +122,8 @@ TIMELINE_NODES = [
         "body": (
             "<p>Many forms, parallel work. <em>wagtail-lms</em> on PyPI in October — "
             "matrix-tested support across Django 4.2–6.0 and Python 3.11–3.14. "
-            "<em>QlubPro</em> built out as a multi-tenant Django SaaS for tennis leagues "
-            "with subdomain tenancy and ContextVar-scoped query isolation. Two competitive "
-            "RFP prototypes in seven days each: <em>CTCMPAO Learning Hub</em> (site "
-            "crawling, PDF extraction, canonical knowledge documents) and <em>CFAS Portal "
-            "MVP</em> (bilingual Django, GeoDjango, Stripe, DRF). Three Omdena collaborations: "
+            "A competitive RFP prototype in seven days: <em>CFAS Portal MVP</em> "
+            "(bilingual Django, GeoDjango, Stripe, DRF). Three Omdena collaborations: "
             "<em>Urban Tree Observatory</em> (recognised as Lead ML Engineer for the "
             "1M-record PostGIS bulk-load), <em>VisionVitals</em>, and <em>CropCycle</em>. "
             "And the IBM RAG &amp; Agentic AI Professional Certificate, eight Coursera "
@@ -141,14 +138,16 @@ TIMELINE_NODES = [
     },
     {
         "year": "2026",
-        "label": "This page",
+        "label": "Production builds",
         "body": (
-            "<p>Built as part of an application for a senior role at the intersection "
-            "of learning design and engineering. The page is the argument: a learning "
-            "designer who can also build the technology can demonstrate the capability "
-            "by building the application experience itself.</p>"
+            "<p><em>QlubPro</em> built out as a multi-tenant Django SaaS for tennis "
+            "leagues with subdomain tenancy and ContextVar-scoped query isolation. "
+            "<em>CTCMPAO Learning Hub</em> — a competitive RFP prototype in seven "
+            "days: site crawling, PDF extraction, canonical knowledge documents, and "
+            "a Wagtail-rendered practitioner-facing hub with SCORM and H5P embedding "
+            "via wagtail-lms.</p>"
         ),
-        "audience_tags": ["generic"],
+        "audience_tags": ["generic", "learning_engineer", "lms_architect"],
     },
 ]
 
